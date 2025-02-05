@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id            Int      @id @default(autoincrement()) @map("id")
+  email         String   @unique @map("email")
+  firstName     String   @map("first_name")
+  secondName    String?  @map("second_name")
+  firstSurname  String   @map("first_surname")
+  secondSurname String?  @map("second_surname")
+  phoneNumbers  String[] @map("phone_numbers")
+
+  user     User?
+  customer Customer?
+
+  identifications Identification[]
+
+  @@index(email)
+  @@map("people")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique @map("username")
+  password String  @map("password")
+  active   Boolean @default(true) @map("active")
+
+  personId Int    @unique @map("person_id")
+  person   Person @relation(fields: [personId], references: [id])
+
+  @@map("users")
+}
+
+enum IdentificationType {
+  DNI
+  PASSPORT
+  RUC
+}
+
+model Identification {
+  id     Int                @id @default(autoincrement())
+  type   IdentificationType @map("type")
+  value  String             @unique @map("value")
+  active Boolean            @default(true) @map("active")
+
+  personId Int    @map("person_id")
+  person   Person @relation(fields: [personId], references: [id])
+
+  @@map("identifications")
+}
+
+model Customer {
+  id      Int     @id @default(autoincrement())
+  address String? @map("address")
+
+  personId Int     @unique @map("person_id")
+  person   Person  @relation(fields: [personId], references: [id])
+  active   Boolean @default(true) @map("active")
+
+  sales Sale[]
+
+  @@map("customers")
+}
+
+model Category {
+  id     Int     @id @default(autoincrement()) @map("id")
+  name   String  @unique @map("name")
+  active Boolean @default(true) @map("active")
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             Int     @id @default(autoincrement()) @map("id")
+  barcode        String? @map("barcode")
+  name           String  @map("name")
+  description    String? @map("description")
+  retailPrice    Float   @map("retail_price")
+  wholesalePrice Float   @map("wholesale_price")
+  wholesaleQty   Int     @map("wholesale_qty")
+  minStock       Int     @map("min_stock")
+  active         Boolean @default(true) @map("active")
+
+  categoryId Int      @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  lots Lot[]
+}
+
+model Supplier {
+  id      Int     @id @default(autoincrement()) @map("id")
+  name    String  @unique @map("name")
+  phone   String? @map("phone")
+  address String? @map("address")
+  active  Boolean @default(true) @map("active")
+
+  lots Lot[]
+
+  @@map("suppliers")
+}
+
+model Lot {
+  id           Int   @id @default(autoincrement()) @map("id")
+  purchasedQty Int   @map("purchased_qty")
+  stock        Int   @map("stock")
+  unitCost     Float @map("unit_cost")
+  totalCost    Float @map("total_cost")
+
+  productId  Int      @map("product_id")
+  product    Product  @relation(fields: [productId], references: [id])
+  supplierId Int      @map("supplier_id")
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+
+  items Item[]
+}
+
+model Sale {
+  id       Int      @id @default(autoincrement()) @map("id")
+  dateTime DateTime @map("date_time") @db.Timestamp(0)
+  subTotal Float    @map("sub_total")
+  discount Float    @map("discount")
+  total    Float    @map("total")
+  active   Boolean  @default(true) @map("active")
+
+  customerId Int?      @map("customer_id")
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  items Item[]
+}
+
+model Item {
+  id        Int   @id @default(autoincrement()) @map("id")
+  qty       Int   @map("qty")
+  unitPrice Float @map("unit_price")
+
+  lotId  Int  @map("lot_id")
+  lot    Lot  @relation(fields: [lotId], references: [id])
+  saleId Int  @map("sale_id")
+  sale   Sale @relation(fields: [saleId], references: [id])
+}
