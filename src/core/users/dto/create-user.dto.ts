@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { Type } from 'class-transformer'
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator'
 import { EntityExists } from 'src/common/validators/entity-exists.validator'
 import { IsUnique } from 'src/common/validators/unique.validator'
 
@@ -17,7 +17,7 @@ export class CreateUserDto implements Omit<Prisma.UserCreateManyInput, 'id'> {
   @Type(() => Boolean)
   active?: boolean
 
-  @IsNumber({}, { message: 'personId must be a number' })
+  @IsInt({ message: 'personId must be a number' })
   @EntityExists('person')
   personId: number
 }

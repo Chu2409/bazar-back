@@ -5,10 +5,10 @@ import { User } from '@prisma/client'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 import { hashPassword } from 'src/common/utils/encrypter'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { CrudService } from 'src/common/services/crud.service'
+import { BaseService } from 'src/common/services/base.service'
 
 @Injectable()
-export class UsersService extends CrudService<
+export class UsersService extends BaseService<
   User,
   CreateUserDto,
   UpdateUserDto

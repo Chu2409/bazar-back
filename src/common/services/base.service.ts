@@ -9,7 +9,7 @@ import { DisplayableException } from 'src/common/exceptions/displayable.exceptio
 import { PrismaClient } from '@prisma/client'
 
 @Injectable()
-export abstract class CrudService<T, CreateDto, UpdateDto> {
+export abstract class BaseService<T, CreateDto, UpdateDto> {
   constructor(
     protected readonly prismaService: PrismaService,
     protected readonly modelName: keyof PrismaClient,

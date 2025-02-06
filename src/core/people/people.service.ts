@@ -3,9 +3,9 @@ import { CreatePersonDto } from './dto/create-person.dto'
 import { UpdatePersonDto } from './dto/update-person.dto'
 import { Person } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { CrudService } from 'src/common/services/crud.service'
+import { BaseService } from 'src/common/services/base.service'
 @Injectable()
-export class PeopleService extends CrudService<
+export class PeopleService extends BaseService<
   Person,
   CreatePersonDto,
   UpdatePersonDto

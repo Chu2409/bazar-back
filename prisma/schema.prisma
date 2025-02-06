@@ -52,6 +52,8 @@ model Identification {
   personId Int    @map("person_id")
   person   Person @relation(fields: [personId], references: [id])
 
+  @@unique([type, value])
+  @@index([value])
   @@map("identifications")
 }
 
@@ -80,19 +82,23 @@ model Category {
 
 model Product {
   id             Int     @id @default(autoincrement()) @map("id")
-  barcode        String? @map("barcode")
+  barcode        String? @unique @map("barcode")
   name           String  @map("name")
   description    String? @map("description")
   retailPrice    Float   @map("retail_price")
   wholesalePrice Float   @map("wholesale_price")
   wholesaleQty   Int     @map("wholesale_qty")
   minStock       Int     @map("min_stock")
+  image          String? @map("image")
   active         Boolean @default(true) @map("active")
 
   categoryId Int      @map("category_id")
   category   Category @relation(fields: [categoryId], references: [id])
 
   lots Lot[]
+
+  @@index([barcode])
+  @@map("products")
 }
 
 model Supplier {
@@ -120,6 +126,8 @@ model Lot {
   supplier   Supplier @relation(fields: [supplierId], references: [id])
 
   items Item[]
+
+  @@map("lots")
 }
 
 model Sale {
@@ -134,6 +142,8 @@ model Sale {
   customer   Customer? @relation(fields: [customerId], references: [id])
 
   items Item[]
+
+  @@map("sales")
 }
 
 model Item {
@@ -145,4 +155,7 @@ model Item {
   lot    Lot  @relation(fields: [lotId], references: [id])
   saleId Int  @map("sale_id")
   sale   Sale @relation(fields: [saleId], references: [id])
+
+  @@unique([lotId, saleId])
+  @@map("items")
 }
