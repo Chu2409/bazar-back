@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 import {
   registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -14,8 +14,11 @@ import { PrismaService } from 'src/global/prisma/prisma.service'
 export class EntityExistsConstraint implements ValidatorConstraintInterface {
   constructor(private prisma: PrismaService) {}
 
-  async validate(value: unknown, args: any): Promise<boolean> {
-    if (!value) return true // Skip validation if no value
+  async validate(value: unknown, args: ValidationArguments): Promise<boolean> {
+    if (value === null || value === undefined || value === '') {
+      // Si el valor está vacío, permitimos que otras validaciones manejen el error
+      return true
+    }
 
     const { model, field = 'id' } = args.constraints[0]
 
@@ -25,16 +28,14 @@ export class EntityExistsConstraint implements ValidatorConstraintInterface {
         where: { [field]: value },
       })
 
-      if (!entity) throw new BadRequestException(this.defaultMessage(args))
-
-      return !!entity
+      return !!entity // Retorna `false` si no existe, activando el mensaje de error
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch (error: unknown) {
       return false
     }
   }
 
-  defaultMessage(args?: any): string {
+  defaultMessage(args: ValidationArguments): string {
     const { model, field = 'id' } = args.constraints[0]
     return `${model} with ${field} ${args.value} does not exist`
   }
