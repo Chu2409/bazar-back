@@ -17,12 +17,13 @@ export class AuthService {
     const user = await this.prismaService.user.findUnique({
       where: {
         username,
+        active: true,
       },
     })
 
     if (!user)
       throw new DisplayableException(
-        'Usuario no encontrado',
+        'Usuario activo no encontrado',
         HttpStatus.NOT_FOUND,
       )
 

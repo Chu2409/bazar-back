@@ -12,6 +12,12 @@ import { PrismaService } from './global/prisma/prisma.service'
 import { CustomConfigModule } from './global/config/config.module'
 import { PrismaModule } from './global/prisma/prisma.module'
 import { CustomersModule } from './core/customers/customers.module'
+import { CategoriesModule } from './core/categories/categories.module'
+import { ProductsModule } from './core/products/products.module'
+import { SuppliersModule } from './core/suppliers/suppliers.module'
+import { SalesModule } from './core/sales/sales.module'
+import { LotsModule } from './core/lots/lots.module'
+import { ItemsModule } from './core/items/items.module'
 @Module({
   imports: [
     PeopleModule,
@@ -20,6 +26,12 @@ import { CustomersModule } from './core/customers/customers.module'
     CustomConfigModule,
     PrismaModule,
     CustomersModule,
+    CategoriesModule,
+    ProductsModule,
+    SuppliersModule,
+    SalesModule,
+    LotsModule,
+    ItemsModule,
   ],
   providers: [
     AppService,

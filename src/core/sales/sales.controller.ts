@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -8,17 +9,17 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
-import { PeopleService } from './people.service'
-import { CreatePersonDto } from './dto/create-person.dto'
-import { UpdatePersonDto } from './dto/update-person.dto'
+import { SalesService } from './sales.service'
+import { CreateSaleDto } from './dto/create-sale.dto'
+import { UpdateSaleDto } from './dto/update-sale.dto'
 import { PaginationDto } from 'src/common/dtos/pagination.dto'
 
-@Controller('people')
-export class PeopleController {
-  constructor(private readonly service: PeopleService) {}
+@Controller('sales')
+export class SalesController {
+  constructor(private readonly service: SalesService) {}
 
   @Post()
-  create(@Body() createDto: CreatePersonDto) {
+  create(@Body() createDto: CreateSaleDto) {
     return this.service.create(createDto)
   }
 
@@ -35,8 +36,13 @@ export class PeopleController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateDto: UpdatePersonDto,
+    @Body() updateDto: UpdateSaleDto,
   ) {
     return this.service.update(id, updateDto)
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remove(id)
   }
 }

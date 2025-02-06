@@ -11,6 +11,7 @@ import { IsUnique } from 'src/common/validators/unique.validator'
 export class CreatePersonDto
   implements Omit<Prisma.PersonCreateManyInput, 'id'>
 {
+  @IsOptional()
   @IsEmail({}, { message: 'email must be a valid email address' })
   @IsUnique('person', 'email')
   email: string

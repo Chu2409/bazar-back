@@ -5,7 +5,7 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { PrismaClient } from '@prisma/client'
 
@@ -15,6 +15,11 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async validate(value: unknown, args: ValidationArguments) {
+    if (value === null || value === undefined || value === '') {
+      // Si el valor es vacío, permitimos que otras validaciones manejen el error
+      return true
+    }
+
     const [modelName, field] = args.constraints
 
     // @ts-expect-error - modelName is a string
@@ -22,10 +27,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
       where: { [field]: value },
     })
 
-    if (existingEntity.length > 0)
-      throw new BadRequestException(this.defaultMessage(args))
-
-    return true
+    return existingEntity.length === 0
   }
 
   defaultMessage(args: ValidationArguments) {
