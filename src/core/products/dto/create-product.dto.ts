@@ -19,7 +19,7 @@ export class CreateProductDto
   @IsPositive({ message: 'retailPrice must be a positive number' })
   retailPrice: number
 
-  @IsPositive({ message: 'retailQty must be a positive number' })
+  @IsPositive({ message: 'wholesalePrice must be a positive number' })
   wholesalePrice: number
 
   @IsPositive({ message: 'wholesaleQty must be a positive number' })

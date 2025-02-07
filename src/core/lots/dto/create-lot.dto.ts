@@ -3,22 +3,23 @@ import { IsPositive } from 'class-validator'
 import { EntityExists } from 'src/common/validators/entity-exists.validator'
 
 export class CreateLotDto implements Omit<Prisma.LotCreateManyInput, 'id'> {
-  @IsPositive({ message: 'La cantidad comprada debe ser un número positivo' })
+  @IsPositive({ message: 'purchasedQty must be a positive number' })
   purchasedQty: number
 
-  @IsPositive({ message: 'La cantidad en stock debe ser un número positivo' })
+  @IsPositive({ message: 'stock must be a positive number' })
   stock: number
 
-  @IsPositive({ message: 'El costo unitario debe ser un número positivo' })
+  @IsPositive({ message: 'unitCost must be a positive number' })
   unitCost: number
 
-  @IsPositive({ message: 'El costo total debe ser un número positivo' })
+  @IsPositive({ message: 'totalCost must be a positive number' })
   totalCost: number
 
-  @IsPositive({ message: 'El id del producto debe ser un número positivo' })
+  @IsPositive({ message: 'productId must be a positive number' })
+  @EntityExists('product')
   productId: number
 
-  @IsPositive({ message: 'El id del proveedor debe ser un número positivo' })
+  @IsPositive({ message: 'supplierId must be a positive number' })
   @EntityExists('supplier')
   supplierId: number
 }

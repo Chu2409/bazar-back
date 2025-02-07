@@ -5,11 +5,13 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator'
+import { IsUnique } from 'src/common/validators/unique.validator'
 
 export class CreateSupplierDto
   implements Omit<Prisma.SupplierCreateManyInput, 'id'>
 {
   @IsString({ message: 'name must be a string' })
+  @IsUnique('supplier', 'name')
   name: string
 
   @IsOptional()

@@ -18,6 +18,7 @@ import { SuppliersModule } from './core/suppliers/suppliers.module'
 import { SalesModule } from './core/sales/sales.module'
 import { LotsModule } from './core/lots/lots.module'
 import { ItemsModule } from './core/items/items.module'
+import { IdentificationsModule } from './core/identifications/identifications.module'
 @Module({
   imports: [
     PeopleModule,
@@ -32,6 +33,7 @@ import { ItemsModule } from './core/items/items.module'
     SalesModule,
     LotsModule,
     ItemsModule,
+    IdentificationsModule,
   ],
   providers: [
     AppService,
