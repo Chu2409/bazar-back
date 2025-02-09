@@ -32,7 +32,7 @@ export class AuthService {
     if (!isPasswordValid)
       throw new DisplayableException(
         'Creedenciales incorrectas',
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.BAD_REQUEST,
       )
 
     return {
