@@ -12,7 +12,7 @@ import {
 import { CustomersService } from './customers.service'
 import { CreateCustomerDto } from './dto/create-customer.dto'
 import { UpdateCustomerDto } from './dto/update-customer.dto'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Controller('customers')
 export class CustomersController {
@@ -24,7 +24,7 @@ export class CustomersController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: BaseParamsDto) {
     return this.service.findAll(paginationDto)
   }
 

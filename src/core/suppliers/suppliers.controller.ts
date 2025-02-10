@@ -12,7 +12,7 @@ import {
 import { SuppliersService } from './suppliers.service'
 import { CreateSupplierDto } from './dto/create-supplier.dto'
 import { UpdateSupplierDto } from './dto/update-supplier.dto'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -24,7 +24,7 @@ export class SuppliersController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: BaseParamsDto) {
     return this.service.findAll(paginationDto)
   }
 

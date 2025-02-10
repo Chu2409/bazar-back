@@ -11,7 +11,7 @@ import {
 import { LotsService } from './lots.service'
 import { CreateLotDto } from './dto/create-lot.dto'
 import { UpdateLotDto } from './dto/update-lot.dto'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Controller('lots')
 export class LotsController {
@@ -23,7 +23,7 @@ export class LotsController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: BaseParamsDto) {
     return this.service.findAll(paginationDto)
   }
 

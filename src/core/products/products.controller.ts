@@ -12,7 +12,7 @@ import {
 import { ProductsService } from './products.service'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { ProductsFiltersDto } from './dto/filters.dto'
 
 @Controller('products')
 export class ProductsController {
@@ -24,7 +24,7 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: ProductsFiltersDto) {
     return this.service.findAll(paginationDto)
   }
 

@@ -12,7 +12,7 @@ import {
 import { IdentificationsService } from './identifications.service'
 import { CreateIdentificationDto } from './dto/create-identification.dto'
 import { UpdateIdentificationDto } from './dto/update-identification.dto'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Controller('identifications')
 export class IdentificationsController {
@@ -24,7 +24,7 @@ export class IdentificationsController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: BaseParamsDto) {
     return this.service.findAll(paginationDto)
   }
 

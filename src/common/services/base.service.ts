@@ -3,7 +3,7 @@
 
 import { Injectable, HttpStatus } from '@nestjs/common'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { PaginationDto } from 'src/common/dtos/pagination.dto'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 import { IApiPaginatedRes } from 'src/common/types/api-response.interface'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 import { PrismaClient } from '@prisma/client'
@@ -21,7 +21,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
     })
   }
 
-  async findAll({ limit, page }: PaginationDto): Promise<IApiPaginatedRes<T>> {
+  async findAll({ limit, page }: BaseParamsDto): Promise<IApiPaginatedRes<T>> {
     const [entities, total] = await Promise.all([
       this.prismaService[this.modelName].findMany({
         take: limit,
