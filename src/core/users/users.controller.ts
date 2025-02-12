@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,10 +38,5 @@ export class UsersController {
     @Body() updateDto: UpdateUserDto,
   ) {
     return this.service.update(id, updateDto)
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id)
   }
 }

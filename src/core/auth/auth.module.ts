@@ -17,7 +17,7 @@ import { CustomConfigModule } from 'src/global/config/config.module'
       inject: [CustomConfigService],
       useFactory: (configService: CustomConfigService) => ({
         secret: configService.env.JWT_SECRET,
-        signOptions: { expiresIn: '10s' },
+        signOptions: { expiresIn: '4h' },
       }),
     }),
   ],

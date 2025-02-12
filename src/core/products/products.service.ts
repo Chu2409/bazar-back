@@ -39,6 +39,9 @@ export class ProductsService extends BaseService<
           categoryId,
           active,
         },
+        include: {
+          category: true,
+        },
         orderBy: {
           [sort || 'id']: order || 'desc',
         },
@@ -61,5 +64,18 @@ export class ProductsService extends BaseService<
       page,
       pages: Math.ceil(total / limit),
     }
+  }
+
+  async toggleStatus(id: number): Promise<boolean> {
+    const product = await this.findOne(id)
+
+    const success = await this.prismaService.product.update({
+      where: { id },
+      data: {
+        active: !product.active,
+      },
+    })
+
+    return !!success
   }
 }

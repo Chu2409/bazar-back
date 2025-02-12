@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -33,16 +32,16 @@ export class ProductsController {
     return this.service.findOne(id)
   }
 
+  @Patch(':id/toggle-status')
+  toggleStatus(@Param('id', ParseIntPipe) id: number) {
+    return this.service.toggleStatus(id)
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateProductDto,
   ) {
     return this.service.update(id, updateDto)
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id)
   }
 }

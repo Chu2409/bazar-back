@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,10 +38,5 @@ export class SalesController {
     @Body() updateDto: UpdateSaleDto,
   ) {
     return this.service.update(id, updateDto)
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id)
   }
 }

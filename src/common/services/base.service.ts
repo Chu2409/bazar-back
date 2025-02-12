@@ -61,13 +61,4 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
       data: updateDto,
     })
   }
-
-  async remove(id: number): Promise<T> {
-    await this.findOne(id)
-
-    return await this.prismaService[this.modelName].update({
-      where: { id },
-      data: { active: false },
-    })
-  }
 }
