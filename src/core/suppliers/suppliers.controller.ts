@@ -11,7 +11,7 @@ import {
 import { SuppliersService } from './suppliers.service'
 import { CreateSupplierDto } from './dto/create-supplier.dto'
 import { UpdateSupplierDto } from './dto/update-supplier.dto'
-import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
+import { SuppliersFiltersDto } from './dto/suppliers-filters.dto'
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -23,13 +23,18 @@ export class SuppliersController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: BaseParamsDto) {
+  findAll(@Query() paginationDto: SuppliersFiltersDto) {
     return this.service.findAll(paginationDto)
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id)
+  }
+
+  @Patch(':id/toggle-status')
+  toggleStatus(@Param('id', ParseIntPipe) id: number) {
+    return this.service.toggleStatus(id)
   }
 
   @Patch(':id')

@@ -1,19 +1,20 @@
 import { Prisma } from '@prisma/client'
+import { Type } from 'class-transformer'
 import {
-  ArrayNotEmpty,
+  ArrayMinSize,
   IsArray,
   IsEmail,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator'
-import { IsUnique } from 'src/common/validators/unique.validator'
+import { CreateIdentificationWithoutPersonIdDto } from 'src/core/identifications/dto/create-identification.dto'
 
 export class CreatePersonDto
   implements Omit<Prisma.PersonCreateManyInput, 'id'>
 {
   @IsOptional()
   @IsEmail({}, { message: 'email must be a valid email address' })
-  @IsUnique('person', 'email')
   email: string
 
   @IsString({ message: 'name must be a string' })
@@ -31,7 +32,12 @@ export class CreatePersonDto
   secondSurname?: string
 
   @IsArray({ message: 'phoneNumbers must be an array' })
-  @ArrayNotEmpty({ message: 'phoneNumbers must not be empty' })
   @IsString({ each: true, message: 'phoneNumbers must be an array of strings' })
   phoneNumbers: string[]
+
+  @IsArray({ message: 'identifications must be an array' })
+  @ValidateNested({ each: true })
+  @Type(() => CreateIdentificationWithoutPersonIdDto)
+  @ArrayMinSize(1, { message: 'At least one identification is required' })
+  identifications: CreateIdentificationWithoutPersonIdDto[]
 }

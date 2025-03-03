@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer'
-import { IsInt, IsOptional, IsString, Min } from 'class-validator'
+import { IsInt, IsOptional, Min } from 'class-validator'
 
 export class BaseParamsDto {
   @IsOptional()
@@ -13,21 +13,4 @@ export class BaseParamsDto {
   @IsInt()
   @Min(1)
   limit: number = 10
-
-  @IsOptional()
-  @IsString()
-  search?: string
-
-  @IsOptional()
-  @IsString()
-  sort?: 'id' | 'name' | 'price'
-
-  @IsOptional()
-  @IsString()
-  order?: 'asc' | 'desc'
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  status?: number
 }

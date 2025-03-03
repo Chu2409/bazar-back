@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { BaseService } from 'src/common/services/base.service'
-import { Product } from '@prisma/client'
+import { Prisma, Product } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { ProductsFiltersDto } from './dto/filters.dto'
-import { convertStatus } from 'src/common/utils/params'
+import { ProductsFiltersDto } from './dto/products-filters.dto'
+import {
+  convertToFilterWhere,
+  convertToStatusWhere,
+} from 'src/common/utils/converters'
+import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 
 @Injectable()
 export class ProductsService extends BaseService<
@@ -26,34 +30,39 @@ export class ProductsService extends BaseService<
     categoryId,
     status,
   }: ProductsFiltersDto) {
-    const active = convertStatus(status)
+    const whereClause: Prisma.ProductWhereInput = {
+      name: {
+        contains: search,
+        mode: 'insensitive',
+      },
+      categoryId: {
+        in: convertToFilterWhere(categoryId),
+      },
+      active: convertToStatusWhere(status),
+    }
+
+    const orderBy: Prisma.ProductOrderByWithRelationInput =
+      isValidField(sort, this.prismaService.product.fields) &&
+      isValidSortOrder(order)
+        ? {
+            [sort as string]: order!.toLowerCase(),
+          }
+        : {
+            id: 'desc',
+          }
 
     const [entities, total] = await Promise.all([
       this.prismaService.product.findMany({
         take: limit,
         skip: (page - 1) * limit,
-        where: {
-          name: {
-            contains: search,
-          },
-          categoryId,
-          active,
-        },
+        where: whereClause,
         include: {
           category: true,
         },
-        orderBy: {
-          [sort || 'id']: order || 'desc',
-        },
+        orderBy,
       }),
       this.prismaService.product.count({
-        where: {
-          name: {
-            contains: search,
-          },
-          categoryId,
-          active,
-        },
+        where: whereClause,
       }),
     ])
 
@@ -67,12 +76,12 @@ export class ProductsService extends BaseService<
   }
 
   async toggleStatus(id: number): Promise<boolean> {
-    const product = await this.findOne(id)
+    const entity = await this.findOne(id)
 
     const success = await this.prismaService.product.update({
       where: { id },
       data: {
-        active: !product.active,
+        active: !entity.active,
       },
     })
 

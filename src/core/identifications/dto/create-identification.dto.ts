@@ -25,3 +25,17 @@ export class CreateIdentificationDto
   @EntityExists('person')
   personId: number
 }
+
+export class CreateIdentificationWithoutPersonIdDto
+  implements Omit<Prisma.IdentificationCreateManyInput, 'id' | 'personId'>
+{
+  @IsEnum(IdentificationType)
+  type: IdentificationType
+
+  @IsString({ message: 'value must be a string' })
+  value: string
+
+  @IsOptional()
+  @IsBoolean({ message: 'active must be a boolean' })
+  active?: boolean
+}
