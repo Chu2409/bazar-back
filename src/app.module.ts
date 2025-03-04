@@ -19,6 +19,7 @@ import { SalesModule } from './core/sales/sales.module'
 import { LotsModule } from './core/lots/lots.module'
 import { ItemsModule } from './core/items/items.module'
 import { IdentificationsModule } from './core/identifications/identifications.module'
+import { InventoryModule } from './core/inventory/inventory.module'
 @Module({
   imports: [
     PeopleModule,
@@ -34,6 +35,7 @@ import { IdentificationsModule } from './core/identifications/identifications.mo
     LotsModule,
     ItemsModule,
     IdentificationsModule,
+    InventoryModule,
   ],
   providers: [
     AppService,
