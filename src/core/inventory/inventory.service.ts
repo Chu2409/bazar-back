@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { Prisma } from '@prisma/client'
+import { Lot, Prisma } from '@prisma/client'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { InventoryFiltersDto } from './dto/inventory-filters.dto'
 import {
@@ -8,10 +8,19 @@ import {
   convertToStatusWhere,
 } from 'src/common/utils/converters'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
+import { CreateInventoryDto } from './dto/create-inventory.dto'
+import { UpdateInventoryDto } from './dto/update-inventory.dto'
+import { BaseService } from 'src/common/services/base.service'
 
 @Injectable()
-export class InventoryService {
-  constructor(private readonly prismaService: PrismaService) {}
+export class InventoryService extends BaseService<
+  Lot,
+  CreateInventoryDto,
+  UpdateInventoryDto
+> {
+  constructor(prismaService: PrismaService) {
+    super(prismaService, 'lot')
+  }
 
   include: Prisma.SelectSubset<Prisma.LotInclude, Prisma.LotInclude> = {
     product: {
@@ -20,6 +29,35 @@ export class InventoryService {
       },
     },
     supplier: true,
+  }
+
+  async create(dto: CreateInventoryDto) {
+    const inventory = await this.prismaService.lot.create({
+      data: {
+        ...dto,
+        stock: dto.stock || dto.purchasedQty,
+      },
+      include: this.include,
+    })
+
+    return inventory
+  }
+
+  async update(id: number, dto: UpdateInventoryDto) {
+    await this.findOne(id)
+
+    const inventory = await this.prismaService.lot.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dto,
+        stock: dto.stock || dto.purchasedQty,
+      },
+      include: this.include,
+    })
+
+    return inventory
   }
 
   async findAll({
