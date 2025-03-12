@@ -19,14 +19,16 @@ export class CustomersService extends BaseService<
     super(prismaService, 'customer')
   }
 
-  include: Prisma.SelectSubset<Prisma.CustomerInclude, Prisma.CustomerInclude> =
-    {
-      person: {
-        include: {
-          identifications: true,
-        },
+  private include: Prisma.SelectSubset<
+    Prisma.CustomerInclude,
+    Prisma.CustomerInclude
+  > = {
+    person: {
+      include: {
+        identifications: true,
       },
-    }
+    },
+  }
 
   async findAll({
     limit,

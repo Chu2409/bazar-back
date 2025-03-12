@@ -8,6 +8,8 @@ import { products } from './data/products'
 import { categories } from './data/categories'
 import { suppliers } from './data/suppliers'
 import { lots } from './data/lots'
+import { sales } from './data/sales'
+import { items } from './data/items'
 
 const prisma = new PrismaClient()
 
@@ -42,6 +44,14 @@ const main = async () => {
 
   await prisma.lot.createMany({
     data: lots,
+  })
+
+  await prisma.sale.createMany({
+    data: sales,
+  })
+
+  await prisma.item.createMany({
+    data: items,
   })
 
   Logger.log('Seed data created successfully')

@@ -11,7 +11,7 @@ import {
 import { SalesService } from './sales.service'
 import { CreateSaleDto } from './dto/create-sale.dto'
 import { UpdateSaleDto } from './dto/update-sale.dto'
-import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
+import { SalesFiltersDto } from './dto/sales-filters.dto'
 
 @Controller('sales')
 export class SalesController {
@@ -23,7 +23,7 @@ export class SalesController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: BaseParamsDto) {
+  findAll(@Query() paginationDto: SalesFiltersDto) {
     return this.service.findAll(paginationDto)
   }
 

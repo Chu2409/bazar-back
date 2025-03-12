@@ -132,14 +132,13 @@ model Lot {
 
 model Sale {
   id       Int      @id @default(autoincrement()) @map("id")
-  dateTime DateTime @map("date_time") @db.Timestamp(0)
+  dateTime DateTime @default(now()) @map("date_time") @db.Timestamp(0)
   subTotal Float    @map("sub_total")
   discount Float    @map("discount")
   total    Float    @map("total")
-  active   Boolean  @default(true) @map("active")
 
-  customerId Int?      @map("customer_id")
-  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId Int      @map("customer_id")
+  customer   Customer @relation(fields: [customerId], references: [id])
 
   items Item[]
 
