@@ -8,6 +8,7 @@ import { CustomersFiltersDto } from './dto/customers-filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
+import { CustomersSearchDto } from './dto/search-dto'
 
 @Injectable()
 export class CustomersService extends BaseService<
@@ -28,6 +29,64 @@ export class CustomersService extends BaseService<
         identifications: true,
       },
     },
+  }
+
+  async getBySearch({ search }: CustomersSearchDto) {
+    return this.prismaService.customer.findMany({
+      where: {
+        OR: [
+          {
+            person: {
+              firstName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            person: {
+              secondName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            person: {
+              firstSurname: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            person: {
+              secondSurname: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            person: {
+              identifications: {
+                some: {
+                  value: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: this.include,
+      orderBy: {
+        id: 'desc',
+      },
+      take: 10,
+    })
   }
 
   async findAll({

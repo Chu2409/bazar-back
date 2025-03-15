@@ -12,10 +12,16 @@ import { SuppliersService } from './suppliers.service'
 import { CreateSupplierDto } from './dto/create-supplier.dto'
 import { UpdateSupplierDto } from './dto/update-supplier.dto'
 import { SuppliersFiltersDto } from './dto/suppliers-filters.dto'
+import { SuppliersSearchDto } from './dto/search-dto'
 
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private readonly service: SuppliersService) {}
+
+  @Get('search')
+  getBySearch(@Query() dto: SuppliersSearchDto) {
+    return this.service.getBySearch(dto)
+  }
 
   @Post()
   create(@Body() createDto: CreateSupplierDto) {

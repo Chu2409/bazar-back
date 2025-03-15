@@ -7,6 +7,7 @@ import { PrismaService } from 'src/global/prisma/prisma.service'
 import { SuppliersFiltersDto } from './dto/suppliers-filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
+import { SuppliersSearchDto } from './dto/search-dto'
 
 @Injectable()
 export class SuppliersService extends BaseService<
@@ -16,6 +17,21 @@ export class SuppliersService extends BaseService<
 > {
   constructor(prismaService: PrismaService) {
     super(prismaService, 'supplier')
+  }
+
+  async getBySearch({ search }: SuppliersSearchDto) {
+    return this.prismaService.supplier.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      take: 10,
+    })
   }
 
   async findAll({

@@ -10,6 +10,7 @@ import {
   convertToStatusWhere,
 } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
+import { ProductsSearchDto } from './dto/search-dto'
 
 @Injectable()
 export class ProductsService extends BaseService<
@@ -19,6 +20,31 @@ export class ProductsService extends BaseService<
 > {
   constructor(prismaService: PrismaService) {
     super(prismaService, 'product')
+  }
+
+  async getBySearch({ search }: ProductsSearchDto) {
+    return this.prismaService.product.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            barcode: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      take: 10,
+    })
   }
 
   async findAll({

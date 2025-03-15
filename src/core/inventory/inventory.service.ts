@@ -11,6 +11,7 @@ import { DisplayableException } from 'src/common/exceptions/displayable.exceptio
 import { CreateInventoryDto } from './dto/create-inventory.dto'
 import { UpdateInventoryDto } from './dto/update-inventory.dto'
 import { BaseService } from 'src/common/services/base.service'
+import { InventorySearchDto } from './dto/search-dto'
 
 @Injectable()
 export class InventoryService extends BaseService<
@@ -29,6 +30,42 @@ export class InventoryService extends BaseService<
       },
     },
     supplier: true,
+  }
+
+  async getBySearch({ search }: InventorySearchDto) {
+    return this.prismaService.lot.findMany({
+      where: {
+        OR: [
+          {
+            product: {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            product: {
+              barcode: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+        ],
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      include: {
+        product: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      take: 10,
+    })
   }
 
   async create(dto: CreateInventoryDto) {

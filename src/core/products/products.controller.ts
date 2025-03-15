@@ -12,10 +12,16 @@ import { ProductsService } from './products.service'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
 import { ProductsFiltersDto } from './dto/products-filters.dto'
+import { ProductsSearchDto } from './dto/search-dto'
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly service: ProductsService) {}
+
+  @Get('search')
+  getBySearch(@Query() dto: ProductsSearchDto) {
+    return this.service.getBySearch(dto)
+  }
 
   @Post()
   create(@Body() createDto: CreateProductDto) {

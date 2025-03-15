@@ -7,6 +7,7 @@ import { BaseService } from 'src/common/services/base.service'
 import { CategoriesFiltersDto } from './dto/categories-filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
+import { CategoriesSearchDto } from './dto/search-dto'
 
 @Injectable()
 export class CategoriesService extends BaseService<
@@ -16,6 +17,21 @@ export class CategoriesService extends BaseService<
 > {
   constructor(prismaService: PrismaService) {
     super(prismaService, 'category')
+  }
+
+  async getBySearch({ search }: CategoriesSearchDto) {
+    return this.prismaService.category.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      take: 10,
+    })
   }
 
   async findAll({
