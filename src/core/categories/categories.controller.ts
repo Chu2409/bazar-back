@@ -9,10 +9,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { CategoriesService } from './categories.service'
-import { CreateCategoryDto } from './dto/create-category.dto'
-import { UpdateCategoryDto } from './dto/update-category.dto'
-import { CategoriesFiltersDto } from './dto/categories-filters.dto'
-import { CategoriesSearchDto } from './dto/search-dto'
+import { CreateCategoryDto } from './dto/create.dto'
+import { UpdateCategoryDto } from './dto/update.dto'
+import { CategoriesFiltersDto } from './dto/filters.dto'
+import { CategoriesSearchDto } from './dto/search.dto'
 
 @Controller('categories')
 export class CategoriesController {

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 
-export const lots: Prisma.LotCreateManyInput[] = [
+export const inventories: Prisma.InventoryCreateManyInput[] = [
   {
     purchasedQty: 100,
     stock: 100,

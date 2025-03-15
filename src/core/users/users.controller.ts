@@ -9,8 +9,8 @@ import {
   Query,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { CreateUserDto } from './dto/create.dto'
+import { UpdateUserDto } from './dto/update.dto'
 import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Controller('users')

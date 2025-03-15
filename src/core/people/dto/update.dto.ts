@@ -1,7 +1,7 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types'
-import { CreatePersonDto } from './create-person.dto'
+import { CreatePersonDto } from './create.dto'
 import { IsArray, IsOptional, ValidateNested } from 'class-validator'
-import { UpdateIdentificationWithoutPersonIdDto } from 'src/core/identifications/dto/update-identification.dto'
+import { UpdateIdentificationDto } from 'src/core/identifications/dto/update.dto'
 import { Type } from 'class-transformer'
 
 export class UpdatePersonDto extends PartialType(
@@ -9,7 +9,7 @@ export class UpdatePersonDto extends PartialType(
 ) {
   @IsArray({ message: 'identifications must be an array' })
   @ValidateNested({ each: true })
-  @Type(() => UpdateIdentificationWithoutPersonIdDto)
+  @Type(() => UpdateIdentificationDto)
   @IsOptional()
-  identifications?: UpdateIdentificationWithoutPersonIdDto[]
+  identifications?: UpdateIdentificationDto[]
 }

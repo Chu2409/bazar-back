@@ -9,9 +9,9 @@ import {
   Query,
 } from '@nestjs/common'
 import { SalesService } from './sales.service'
-import { CreateSaleDto } from './dto/create-sale.dto'
-import { UpdateSaleDto } from './dto/update-sale.dto'
-import { SalesFiltersDto } from './dto/sales-filters.dto'
+import { CreateSaleDto } from './dto/create.dto'
+import { UpdateSaleDto } from './dto/update.dto'
+import { SalesFiltersDto } from './dto/sales.dto'
 
 @Controller('sales')
 export class SalesController {

@@ -11,7 +11,7 @@ export class CreateItemDto
   @IsPositive({ message: 'unitPrice must be a positive number' })
   unitPrice: number
 
-  @IsPositive({ message: 'lotId must be a positive number' })
-  @EntityExists('lot')
-  lotId: number
+  @IsPositive({ message: 'inventoryId must be a positive number' })
+  @EntityExists('inventory')
+  inventoryId: number
 }

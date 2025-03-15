@@ -8,7 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator'
-import { CreateIdentificationWithoutPersonIdDto } from 'src/core/identifications/dto/create-identification.dto'
+import { CreateIdentificationDto } from 'src/core/identifications/dto/create.dto'
 
 export class CreatePersonDto
   implements Omit<Prisma.PersonCreateManyInput, 'id'>
@@ -37,7 +37,7 @@ export class CreatePersonDto
 
   @IsArray({ message: 'identifications must be an array' })
   @ValidateNested({ each: true })
-  @Type(() => CreateIdentificationWithoutPersonIdDto)
+  @Type(() => CreateIdentificationDto)
   @ArrayMinSize(1, { message: 'At least one identification is required' })
-  identifications: CreateIdentificationWithoutPersonIdDto[]
+  identifications: CreateIdentificationDto[]
 }

@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator'
-import { CreatePersonDto } from 'src/core/people/dto/create-person.dto'
+import { CreatePersonDto } from 'src/core/people/dto/create.dto'
 
 export class CreateCustomerDto
   implements Omit<Prisma.CustomerCreateManyInput, 'id' | 'personId'>

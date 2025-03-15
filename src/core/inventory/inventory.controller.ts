@@ -10,10 +10,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { InventoryService } from './inventory.service'
-import { InventoryFiltersDto } from './dto/inventory-filters.dto'
-import { CreateInventoryDto } from './dto/create-inventory.dto'
-import { UpdateInventoryDto } from './dto/update-inventory.dto'
-import { InventorySearchDto } from './dto/search-dto'
+import { InventoryFiltersDto } from './dto/filters.dto'
+import { CreateInventoryDto } from './dto/create.dto'
+import { UpdateInventoryDto } from './dto/update.dto'
+import { InventorySearchDto } from './dto/search.dto'
 
 @Controller('inventory')
 export class InventoryController {
@@ -33,11 +33,6 @@ export class InventoryController {
   findAll(@Query() paginationDto: InventoryFiltersDto) {
     return this.service.findAll(paginationDto)
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.inventoryService.findOne(+id)
-  // }
 
   @Patch(':id')
   update(

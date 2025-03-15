@@ -95,7 +95,7 @@ model Product {
   categoryId Int      @map("category_id")
   category   Category @relation(fields: [categoryId], references: [id])
 
-  lots Lot[]
+  inventories Inventory[]
 
   @@index([barcode])
   @@map("products")
@@ -108,12 +108,12 @@ model Supplier {
   address String? @map("address")
   active  Boolean @default(true) @map("active")
 
-  lots Lot[]
+  inventories Inventory[]
 
   @@map("suppliers")
 }
 
-model Lot {
+model Inventory {
   id           Int   @id @default(autoincrement()) @map("id")
   purchasedQty Int   @map("purchased_qty")
   stock        Int   @map("stock")
@@ -127,7 +127,7 @@ model Lot {
 
   items Item[]
 
-  @@map("lots")
+  @@map("inventories")
 }
 
 model Sale {
@@ -150,11 +150,11 @@ model Item {
   qty       Int   @map("qty")
   unitPrice Float @map("unit_price")
 
-  lotId  Int  @map("lot_id")
-  lot    Lot  @relation(fields: [lotId], references: [id])
-  saleId Int  @map("sale_id")
-  sale   Sale @relation(fields: [saleId], references: [id])
+  inventoryId Int       @map("inventory_id")
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  saleId      Int       @map("sale_id")
+  sale        Sale      @relation(fields: [saleId], references: [id])
 
-  @@unique([lotId, saleId])
+  @@unique([inventoryId, saleId])
   @@map("items")
 }

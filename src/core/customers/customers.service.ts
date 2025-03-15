@@ -1,24 +1,17 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
-import { CreateCustomerDto } from './dto/create-customer.dto'
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateCustomerDto } from './dto/create.dto'
 import { UpdateCustomerDto } from './dto/update-customer.dto'
-import { Customer, Prisma } from '@prisma/client'
-import { BaseService } from 'src/common/services/base.service'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { CustomersFiltersDto } from './dto/customers-filters.dto'
+import { CustomersFiltersDto } from './dto/filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
-import { CustomersSearchDto } from './dto/search-dto'
+import { CustomersSearchDto } from './dto/search.dto'
 
 @Injectable()
-export class CustomersService extends BaseService<
-  Customer,
-  CreateCustomerDto,
-  UpdateCustomerDto
-> {
-  constructor(prismaService: PrismaService) {
-    super(prismaService, 'customer')
-  }
+export class CustomersService {
+  constructor(private readonly prismaService: PrismaService) {}
 
   private include: Prisma.SelectSubset<
     Prisma.CustomerInclude,
@@ -145,20 +138,20 @@ export class CustomersService extends BaseService<
     }
   }
 
-  async create(createDto: CreateCustomerDto) {
+  async create(dto: CreateCustomerDto) {
     await this.existsByEmailOrIdentification(
-      createDto.person.email,
-      createDto.person.identifications.map((i) => i.value),
+      dto.person.email,
+      dto.person.identifications.map((i) => i.value),
     )
 
     const customer = await this.prismaService.customer.create({
       data: {
-        ...createDto,
+        ...dto,
         person: {
           create: {
-            ...createDto.person,
+            ...dto.person,
             identifications: {
-              createMany: { data: createDto.person.identifications },
+              createMany: { data: dto.person.identifications },
             },
           },
         },
@@ -169,10 +162,10 @@ export class CustomersService extends BaseService<
     return customer
   }
 
-  async update(id: number, updateDto: UpdateCustomerDto) {
+  async update(id: number, dto: UpdateCustomerDto) {
     await this.existsByEmailOrIdentification(
-      updateDto.person?.email,
-      updateDto.person?.identifications
+      dto.person?.email,
+      dto.person?.identifications
         ?.map((i) => i.value)
         .filter((value): value is string => value !== undefined),
       id,
@@ -181,12 +174,12 @@ export class CustomersService extends BaseService<
     const updated = await this.prismaService.customer.update({
       where: { id },
       data: {
-        ...updateDto,
+        ...dto,
         person: {
           update: {
-            ...updateDto.person,
+            ...dto.person,
             identifications: {
-              updateMany: updateDto.person?.identifications?.map((i) => ({
+              updateMany: dto.person?.identifications?.map((i) => ({
                 where: { id: i.id },
                 data: i,
               })),
@@ -198,6 +191,16 @@ export class CustomersService extends BaseService<
     })
 
     return updated
+  }
+
+  async findOne(id: number) {
+    const entity = await this.prismaService.customer.findUnique({
+      where: { id },
+    })
+
+    if (!entity) throw new NotFoundException(`Customer with id ${id} not found`)
+
+    return entity
   }
 
   async toggleStatus(id: number): Promise<boolean> {

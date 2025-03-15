@@ -9,9 +9,9 @@ import {
   Query,
 } from '@nestjs/common'
 import { ProductsService } from './products.service'
-import { CreateProductDto } from './dto/create-product.dto'
-import { UpdateProductDto } from './dto/update-product.dto'
-import { ProductsFiltersDto } from './dto/products-filters.dto'
+import { CreateProductDto } from './dto/create.dto'
+import { UpdateProductDto } from './dto/update.dto'
+import { ProductsFiltersDto } from './dto/filters.dto'
 import { ProductsSearchDto } from './dto/search-dto'
 
 @Controller('products')

@@ -7,7 +7,7 @@ import { customers } from './data/customers'
 import { products } from './data/products'
 import { categories } from './data/categories'
 import { suppliers } from './data/suppliers'
-import { lots } from './data/lots'
+import { inventories } from './data/inventories'
 import { sales } from './data/sales'
 import { items } from './data/items'
 
@@ -42,8 +42,8 @@ const main = async () => {
     data: suppliers,
   })
 
-  await prisma.lot.createMany({
-    data: lots,
+  await prisma.inventory.createMany({
+    data: inventories,
   })
 
   await prisma.sale.createMany({

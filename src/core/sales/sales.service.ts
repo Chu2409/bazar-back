@@ -1,21 +1,14 @@
-import { Injectable } from '@nestjs/common'
-import { CreateSaleDto } from './dto/create-sale.dto'
-import { UpdateSaleDto } from './dto/update-sale.dto'
-import { BaseService } from 'src/common/services/base.service'
-import { Prisma, Sale } from '@prisma/client'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateSaleDto } from './dto/create.dto'
+import { UpdateSaleDto } from './dto/update.dto'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { SalesFiltersDto } from './dto/sales-filters.dto'
+import { SalesFiltersDto } from './dto/sales.dto'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 
 @Injectable()
-export class SalesService extends BaseService<
-  Sale,
-  CreateSaleDto,
-  UpdateSaleDto
-> {
-  constructor(prismaService: PrismaService) {
-    super(prismaService, 'sale')
-  }
+export class SalesService {
+  constructor(private readonly prismaService: PrismaService) {}
 
   private include: Prisma.SelectSubset<Prisma.SaleInclude, Prisma.SaleInclude> =
     {
@@ -30,7 +23,7 @@ export class SalesService extends BaseService<
       },
       items: {
         include: {
-          lot: {
+          inventory: {
             include: {
               product: true,
             },
@@ -89,6 +82,19 @@ export class SalesService extends BaseService<
     }
   }
 
+  async findOne(id: number) {
+    const entity = await this.prismaService.sale.findUnique({
+      where: { id },
+      include: this.include,
+    })
+
+    if (!entity) {
+      throw new NotFoundException(`Sale with id ${id} not found`)
+    }
+
+    return entity
+  }
+
   async create(createDto: CreateSaleDto) {
     const entity = await this.prismaService.sale.create({
       data: {
@@ -104,6 +110,8 @@ export class SalesService extends BaseService<
   }
 
   async update(id: number, updateDto: UpdateSaleDto) {
+    await this.findOne(id)
+
     const entity = await this.prismaService.sale.update({
       where: { id },
       data: {

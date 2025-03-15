@@ -1,23 +1,16 @@
-import { Injectable } from '@nestjs/common'
-import { CreateCategoryDto } from './dto/create-category.dto'
-import { UpdateCategoryDto } from './dto/update-category.dto'
-import { Category, Prisma } from '@prisma/client'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateCategoryDto } from './dto/create.dto'
+import { UpdateCategoryDto } from './dto/update.dto'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { BaseService } from 'src/common/services/base.service'
-import { CategoriesFiltersDto } from './dto/categories-filters.dto'
+import { CategoriesFiltersDto } from './dto/filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
-import { CategoriesSearchDto } from './dto/search-dto'
+import { CategoriesSearchDto } from './dto/search.dto'
 
 @Injectable()
-export class CategoriesService extends BaseService<
-  Category,
-  CreateCategoryDto,
-  UpdateCategoryDto
-> {
-  constructor(prismaService: PrismaService) {
-    super(prismaService, 'category')
-  }
+export class CategoriesService {
+  constructor(private readonly prismaService: PrismaService) {}
 
   async getBySearch({ search }: CategoriesSearchDto) {
     return this.prismaService.category.findMany({
@@ -79,6 +72,31 @@ export class CategoriesService extends BaseService<
       page,
       pages: Math.ceil(total / limit),
     }
+  }
+
+  async findOne(id: number) {
+    const entity = await this.prismaService.category.findUnique({
+      where: { id },
+    })
+
+    if (!entity) throw new NotFoundException(`Category with id ${id} not found`)
+
+    return entity
+  }
+
+  async create(dto: CreateCategoryDto) {
+    return await this.prismaService.category.create({
+      data: dto,
+    })
+  }
+
+  async update(id: number, dto: UpdateCategoryDto) {
+    await this.findOne(id)
+
+    return await this.prismaService.category.update({
+      where: { id },
+      data: dto,
+    })
   }
 
   async toggleStatus(id: number): Promise<boolean> {

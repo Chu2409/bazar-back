@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { EntityExists } from 'src/common/validators/entity-exists.validator'
-import { CreateItemDto } from 'src/core/items/dto/create-item.dto'
+import { CreateItemDto } from 'src/core/items/dto/create.dto'
 
 export class CreateSaleDto
   implements Omit<Prisma.SaleCreateManyInput, 'id' | 'dateTime'>

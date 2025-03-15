@@ -1,20 +1,34 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { User } from '@prisma/client'
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateUserDto } from './dto/create.dto'
+import { UpdateUserDto } from './dto/update.dto'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 import { hashPassword } from 'src/common/utils/encrypter'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { BaseService } from 'src/common/services/base.service'
+import { BaseParamsDto } from 'src/common/dtos/base-params.dto'
 
 @Injectable()
-export class UsersService extends BaseService<
-  User,
-  CreateUserDto,
-  UpdateUserDto
-> {
-  constructor(prismaService: PrismaService) {
-    super(prismaService, 'user')
+export class UsersService {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async findAll({ limit, page }: BaseParamsDto) {
+    const [entities, total] = await Promise.all([
+      this.prismaService.supplier.findMany({
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+      this.prismaService.supplier.count({}),
+    ])
+
+    return {
+      records: entities,
+      total,
+      limit,
+      page,
+      pages: Math.ceil(total / limit),
+    }
   }
 
   async create(createDto: CreateUserDto) {
@@ -65,5 +79,13 @@ export class UsersService extends BaseService<
         password: hashedPassword,
       },
     })
+  }
+
+  async findOne(id: number) {
+    const user = await this.prismaService.user.findUnique({ where: { id } })
+
+    if (!user) throw new NotFoundException(`User with id ${id} not found`)
+
+    return user
   }
 }
