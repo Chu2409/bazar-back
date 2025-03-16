@@ -5,7 +5,6 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { CategoriesFiltersDto } from './dto/filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { CategoriesSearchDto } from './dto/search.dto'
 
 @Injectable()
@@ -27,14 +26,7 @@ export class CategoriesService {
     })
   }
 
-  async findAll({
-    limit,
-    page,
-    order,
-    search,
-    sort,
-    status,
-  }: CategoriesFiltersDto) {
+  async findAll({ limit, page, search, status }: CategoriesFiltersDto) {
     const whereClause: Prisma.CategoryWhereInput = {
       name: {
         contains: search,
@@ -43,22 +35,14 @@ export class CategoriesService {
       active: convertToStatusWhere(status),
     }
 
-    const orderBy: Prisma.CategoryOrderByWithRelationInput =
-      isValidField(sort, this.prismaService.product.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
-
     const [entities, total] = await Promise.all([
       this.prismaService.category.findMany({
         take: limit,
         skip: (page - 1) * limit,
         where: whereClause,
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.category.count({
         where: whereClause,

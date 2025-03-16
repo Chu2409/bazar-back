@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { InventoryFiltersDto } from './dto/filters.dto'
 import {
   convertToFilterWhere,
@@ -28,28 +27,30 @@ export class InventoryService {
     supplier: true,
   }
 
+  private whereClause = (search?: string): Prisma.InventoryWhereInput => ({
+    OR: [
+      {
+        product: {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
+        product: {
+          barcode: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      },
+    ],
+  })
+
   async getBySearch({ search }: InventorySearchDto) {
     return await this.prismaService.inventory.findMany({
-      where: {
-        OR: [
-          {
-            product: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            product: {
-              barcode: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-        ],
-      },
+      where: this.whereClause(search),
       orderBy: {
         id: 'desc',
       },
@@ -110,28 +111,12 @@ export class InventoryService {
   async findAll({
     limit,
     page,
-    order,
     search,
-    sort,
     status,
-    barcode,
     categoryId,
   }: InventoryFiltersDto) {
     const whereClause: Prisma.InventoryWhereInput = {
-      ...(search && {
-        product: {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-      }),
-      ...(barcode && {
-        barcode: {
-          contains: barcode,
-          mode: 'insensitive',
-        },
-      }),
+      ...this.whereClause(search),
       product: {
         categoryId: {
           in: convertToFilterWhere(categoryId),
@@ -140,24 +125,15 @@ export class InventoryService {
       },
     }
 
-    const orderBy: Prisma.InventoryOrderByWithRelationInput =
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      isValidField(sort, this.prismaService.inventory.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
-
     const [entities, total] = await Promise.all([
       this.prismaService.inventory.findMany({
         take: limit,
         skip: (page - 1) * limit,
         where: whereClause,
         include: this.include,
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.inventory.count({
         where: whereClause,

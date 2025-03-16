@@ -5,7 +5,6 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { CustomersFiltersDto } from './dto/filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 import { CustomersSearchDto } from './dto/search.dto'
 
@@ -24,74 +23,41 @@ export class CustomersService {
     },
   }
 
-  async getBySearch({ search }: CustomersSearchDto) {
-    return this.prismaService.customer.findMany({
-      where: {
-        OR: [
-          {
-            person: {
-              firstName: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
+  private whereClause = (search?: string): Prisma.CustomerWhereInput => ({
+    OR: [
+      {
+        person: {
+          firstName: {
+            contains: search,
+            mode: 'insensitive',
           },
-          {
-            person: {
-              secondName: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            person: {
-              firstSurname: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            person: {
-              secondSurname: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            person: {
-              identifications: {
-                some: {
-                  value: {
-                    contains: search,
-                    mode: 'insensitive',
-                  },
-                },
-              },
-            },
-          },
-        ],
+        },
       },
-      include: this.include,
-      orderBy: {
-        id: 'desc',
+      {
+        person: {
+          secondName: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
       },
-      take: 10,
-    })
-  }
-
-  async findAll({
-    limit,
-    page,
-    order,
-    search,
-    sort,
-    status,
-  }: CustomersFiltersDto) {
-    const whereClause: Prisma.CustomerWhereInput = {
-      ...(search && {
+      {
+        person: {
+          firstSurname: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
+        person: {
+          secondSurname: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
         person: {
           identifications: {
             some: {
@@ -102,19 +68,26 @@ export class CustomersService {
             },
           },
         },
-      }),
+      },
+    ],
+  })
+
+  async getBySearch({ search }: CustomersSearchDto) {
+    return this.prismaService.customer.findMany({
+      where: this.whereClause(search),
+      include: this.include,
+      orderBy: {
+        id: 'desc',
+      },
+      take: 10,
+    })
+  }
+
+  async findAll({ limit, page, search, status }: CustomersFiltersDto) {
+    const whereClause: Prisma.CustomerWhereInput = {
+      ...this.whereClause(search),
       active: convertToStatusWhere(status),
     }
-
-    const orderBy: Prisma.CustomerOrderByWithRelationInput =
-      isValidField(sort, this.prismaService.product.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
 
     const [entities, total] = await Promise.all([
       this.prismaService.customer.findMany({
@@ -122,7 +95,9 @@ export class CustomersService {
         skip: (page - 1) * limit,
         where: whereClause,
         include: this.include,
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.customer.count({
         where: whereClause,

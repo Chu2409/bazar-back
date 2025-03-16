@@ -6,7 +6,6 @@ import {
   convertToFilterWhere,
   convertToStatusWhere,
 } from 'src/common/utils/converters'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { ProductsSearchDto } from './dto/search-dto'
 import { CreateProductDto } from './dto/create.dto'
 import { UpdateProductDto } from './dto/update.dto'
@@ -43,9 +42,7 @@ export class ProductsService {
   async findAll({
     limit,
     page,
-    order,
     search,
-    sort,
     categoryId,
     status,
   }: ProductsFiltersDto) {
@@ -60,16 +57,6 @@ export class ProductsService {
       active: convertToStatusWhere(status),
     }
 
-    const orderBy: Prisma.ProductOrderByWithRelationInput =
-      isValidField(sort, this.prismaService.product.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
-
     const [entities, total] = await Promise.all([
       this.prismaService.product.findMany({
         take: limit,
@@ -78,7 +65,9 @@ export class ProductsService {
         include: {
           category: true,
         },
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.product.count({
         where: whereClause,

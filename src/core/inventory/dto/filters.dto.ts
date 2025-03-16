@@ -8,18 +8,6 @@ export class InventoryFiltersDto extends BaseParamsDto {
   search?: string
 
   @IsOptional()
-  @IsString()
-  barcode?: string
-
-  @IsOptional()
-  @IsString()
-  sort?: 'id' | 'name' | 'price'
-
-  @IsOptional()
-  @IsString()
-  order?: 'asc' | 'desc'
-
-  @IsOptional()
   @Type(() => Number)
   @IsInt({ each: true })
   categoryId?: number | number[]

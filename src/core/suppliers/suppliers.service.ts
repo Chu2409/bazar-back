@@ -4,7 +4,6 @@ import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { SuppliersFiltersDto } from './dto/filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 import { SuppliersSearchDto } from './dto/search.dto'
 
 @Injectable()
@@ -26,14 +25,7 @@ export class SuppliersService {
     })
   }
 
-  async findAll({
-    limit,
-    page,
-    order,
-    search,
-    sort,
-    status,
-  }: SuppliersFiltersDto) {
+  async findAll({ limit, page, search, status }: SuppliersFiltersDto) {
     const whereClause: Prisma.SupplierWhereInput = {
       name: {
         contains: search,
@@ -42,22 +34,14 @@ export class SuppliersService {
       active: convertToStatusWhere(status),
     }
 
-    const orderBy: Prisma.SupplierOrderByWithRelationInput =
-      isValidField(sort, this.prismaService.product.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
-
     const [entities, total] = await Promise.all([
       this.prismaService.supplier.findMany({
         take: limit,
         skip: (page - 1) * limit,
         where: whereClause,
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.supplier.count({
         where: whereClause,

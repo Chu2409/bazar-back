@@ -8,14 +8,6 @@ export class ProductsFiltersDto extends BaseParamsDto {
   search?: string
 
   @IsOptional()
-  @IsString()
-  sort?: 'id' | 'name' | 'price'
-
-  @IsOptional()
-  @IsString()
-  order?: 'asc' | 'desc'
-
-  @IsOptional()
   @Type(() => Number)
   @IsInt({ each: true })
   status?: number | number[]

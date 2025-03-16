@@ -5,12 +5,4 @@ export class SalesFiltersDto extends BaseParamsDto {
   @IsOptional()
   @IsString()
   search?: string
-
-  @IsOptional()
-  @IsString()
-  sort?: 'id' | 'name' | 'price'
-
-  @IsOptional()
-  @IsString()
-  order?: 'asc' | 'desc'
 }

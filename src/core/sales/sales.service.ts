@@ -4,7 +4,6 @@ import { UpdateSaleDto } from './dto/update.dto'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { SalesFiltersDto } from './dto/sales.dto'
-import { isValidField, isValidSortOrder } from 'src/common/utils/validators'
 
 @Injectable()
 export class SalesService {
@@ -32,10 +31,42 @@ export class SalesService {
       },
     }
 
-  async findAll({ limit, page, order, search, sort }: SalesFiltersDto) {
-    const whereClause: Prisma.SaleWhereInput = {
-      ...(search && {
-        customer: {
+  private whereClause = (search?: string): Prisma.SaleWhereInput => ({
+    customer: {
+      OR: [
+        {
+          person: {
+            firstName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          person: {
+            secondName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          person: {
+            firstSurname: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
+          person: {
+            secondSurname: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+        {
           person: {
             identifications: {
               some: {
@@ -47,18 +78,14 @@ export class SalesService {
             },
           },
         },
-      }),
-    }
+      ],
+    },
+  })
 
-    const orderBy: Prisma.SaleOrderByWithRelationInput =
-      isValidField(sort, this.prismaService.product.fields) &&
-      isValidSortOrder(order)
-        ? {
-            [sort as string]: order!.toLowerCase(),
-          }
-        : {
-            id: 'desc',
-          }
+  async findAll({ limit, page, search }: SalesFiltersDto) {
+    const whereClause: Prisma.SaleWhereInput = {
+      ...this.whereClause(search),
+    }
 
     const [entities, total] = await Promise.all([
       this.prismaService.sale.findMany({
@@ -66,7 +93,9 @@ export class SalesService {
         skip: (page - 1) * limit,
         where: whereClause,
         include: this.include,
-        orderBy,
+        orderBy: {
+          id: 'desc',
+        },
       }),
       this.prismaService.sale.count({
         where: whereClause,
