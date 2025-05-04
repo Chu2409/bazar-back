@@ -66,7 +66,7 @@ export class SuppliersService {
     }
   }
 
-  async create(dto: CreateSupplierDto): Promise<SupplierResDto> {
+  async create(dto: CreateSupplierDto) {
     const alreadyExists = await this.prismaService.supplier.findUnique({
       where: {
         name: dto.name,
@@ -79,12 +79,12 @@ export class SuppliersService {
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.supplier.create({
+    await this.prismaService.supplier.create({
       data: dto,
     })
   }
 
-  async update(id: number, dto: UpdateSupplierDto): Promise<SupplierResDto> {
+  async update(id: number, dto: UpdateSupplierDto) {
     await this.findOne(id)
 
     const alreadyExists = await this.prismaService.supplier.findUnique({
@@ -104,13 +104,13 @@ export class SuppliersService {
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.supplier.update({
+    await this.prismaService.supplier.update({
       where: { id },
       data: dto,
     })
   }
 
-  async findOne(id: number): Promise<SupplierResDto> {
+  async findOne(id: number) {
     const entity = await this.prismaService.supplier.findUnique({
       where: { id },
     })
@@ -122,16 +122,14 @@ export class SuppliersService {
     return entity
   }
 
-  async toggleStatus(id: number): Promise<boolean> {
+  async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    const success = await this.prismaService.supplier.update({
+    await this.prismaService.supplier.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
-
-    return !!success
   }
 }

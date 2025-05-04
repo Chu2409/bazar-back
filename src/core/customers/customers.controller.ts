@@ -13,6 +13,7 @@ import { CreateCustomerDto } from './dto/req/create-customer.dto'
 import { UpdateCustomerDto } from './dto/req/update-customer.dto'
 import { CustomersFiltersDto } from './dto/req/customer-filters.dto'
 import { CustomersSearchDto } from './dto/req/customer-search.dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('customers')
 export class CustomersController {
@@ -24,6 +25,7 @@ export class CustomersController {
   }
 
   @Post()
+  @ApiMessage('Cliente creado correctamente')
   create(@Body() createDto: CreateCustomerDto) {
     return this.service.create(createDto)
   }
@@ -39,11 +41,13 @@ export class CustomersController {
   // }
 
   @Patch(':id/toggle-status')
+  @ApiMessage('Cliente actualizado correctamente')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
     return this.service.toggleStatus(id)
   }
 
   @Patch(':id')
+  @ApiMessage('Cliente actualizado correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateCustomerDto,

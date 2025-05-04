@@ -14,6 +14,7 @@ import { InventoryFiltersDto } from './dto/req/inventory-filters.dto'
 import { CreateInventoryDto } from './dto/req/create-inventory.dto'
 import { UpdateInventoryDto } from './dto/req/update-inventory.dto'
 import { InventorySearchDto } from './dto/req/inventory-search.dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('inventory')
 export class InventoryController {
@@ -25,6 +26,7 @@ export class InventoryController {
   }
 
   @Post()
+  @ApiMessage('Inventario creado correctamente')
   create(@Body() dto: CreateInventoryDto) {
     return this.service.create(dto)
   }
@@ -35,6 +37,7 @@ export class InventoryController {
   }
 
   @Patch(':id')
+  @ApiMessage('Inventario actualizado correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateInventoryDto: UpdateInventoryDto,
@@ -43,6 +46,7 @@ export class InventoryController {
   }
 
   @Delete(':id')
+  @ApiMessage('Inventario eliminado correctamente')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id)
   }

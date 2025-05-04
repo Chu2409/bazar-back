@@ -12,12 +12,14 @@ import { SalesService } from './sales.service'
 import { CreateSaleDto } from './dto/req/create-sale.dto'
 import { UpdateSaleDto } from './dto/req/update-sale.dto'
 import { SalesFiltersDto } from './dto/req/sale-filters.dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('sales')
 export class SalesController {
   constructor(private readonly service: SalesService) {}
 
   @Post()
+  @ApiMessage('Venta creada correctamente')
   create(@Body() createDto: CreateSaleDto) {
     return this.service.create(createDto)
   }
@@ -33,6 +35,7 @@ export class SalesController {
   // }
 
   @Patch(':id')
+  @ApiMessage('Venta actualizada correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateSaleDto,

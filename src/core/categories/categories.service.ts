@@ -78,7 +78,7 @@ export class CategoriesService {
     return entity
   }
 
-  async create(dto: CreateCategoryDto): Promise<CategoryResDto> {
+  async create(dto: CreateCategoryDto) {
     const alreadyExists = await this.prismaService.category.findUnique({
       where: {
         name: dto.name,
@@ -91,12 +91,12 @@ export class CategoriesService {
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.category.create({
+    await this.prismaService.category.create({
       data: dto,
     })
   }
 
-  async update(id: number, dto: UpdateCategoryDto): Promise<CategoryResDto> {
+  async update(id: number, dto: UpdateCategoryDto) {
     await this.findOne(id)
 
     const alreadyExists = await this.prismaService.category.findUnique({
@@ -116,22 +116,20 @@ export class CategoriesService {
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.category.update({
+    await this.prismaService.category.update({
       where: { id },
       data: dto,
     })
   }
 
-  async toggleStatus(id: number): Promise<boolean> {
+  async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    const success = await this.prismaService.category.update({
+    await this.prismaService.category.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
-
-    return !!success
   }
 }

@@ -13,6 +13,7 @@ import { CreateCategoryDto } from './dto/req/create-category.dto'
 import { UpdateCategoryDto } from './dto/req/update-category.dto'
 import { CategoriesFiltersDto } from './dto/req/category-filters.dto'
 import { CategoriesSearchDto } from './dto/req/category-search.dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('categories')
 export class CategoriesController {
@@ -29,11 +30,13 @@ export class CategoriesController {
   // }
 
   @Patch(':id/toggle-status')
+  @ApiMessage('Categoría actualizada correctamente')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
     return this.service.toggleStatus(id)
   }
 
   @Patch(':id')
+  @ApiMessage('Categoría actualizada correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateCategoryDto,
@@ -47,6 +50,7 @@ export class CategoriesController {
   }
 
   @Post()
+  @ApiMessage('Categoría creada correctamente')
   create(@Body() createDto: CreateCategoryDto) {
     return this.service.create(createDto)
   }

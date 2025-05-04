@@ -4,6 +4,8 @@ import { UpdateSaleDto } from './dto/req/update-sale.dto'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { SalesFiltersDto } from './dto/req/sale-filters.dto'
+import { IApiPaginatedRes } from 'src/common/types/api-response.interface'
+import { SaleResDto } from './dto/res/sale-res.dto'
 
 @Injectable()
 export class SalesService {
@@ -31,7 +33,11 @@ export class SalesService {
         include: {
           inventory: {
             include: {
-              product: true,
+              product: {
+                omit: {
+                  categoryId: true,
+                },
+              },
             },
             omit: {
               productId: true,
@@ -97,7 +103,11 @@ export class SalesService {
     },
   })
 
-  async findAll({ limit, page, search }: SalesFiltersDto) {
+  async findAll({
+    limit,
+    page,
+    search,
+  }: SalesFiltersDto): Promise<IApiPaginatedRes<SaleResDto>> {
     const whereClause: Prisma.SaleWhereInput = {
       ...this.whereClause(search),
     }
@@ -121,6 +131,7 @@ export class SalesService {
     ])
 
     return {
+      // @ts-expect-error type
       records: entities,
       total,
       limit,
@@ -132,7 +143,6 @@ export class SalesService {
   async findOne(id: number) {
     const entity = await this.prismaService.sale.findUnique({
       where: { id },
-      include: this.include,
     })
 
     if (!entity) {
@@ -143,23 +153,20 @@ export class SalesService {
   }
 
   async create(createDto: CreateSaleDto) {
-    const entity = await this.prismaService.sale.create({
+    await this.prismaService.sale.create({
       data: {
         ...createDto,
         items: {
           createMany: { data: createDto.items },
         },
       },
-      include: this.include,
     })
-
-    return entity
   }
 
   async update(id: number, updateDto: UpdateSaleDto) {
     await this.findOne(id)
 
-    const entity = await this.prismaService.sale.update({
+    await this.prismaService.sale.update({
       where: { id },
       data: {
         ...updateDto,
@@ -170,9 +177,6 @@ export class SalesService {
           })),
         },
       },
-      include: this.include,
     })
-
-    return entity
   }
 }

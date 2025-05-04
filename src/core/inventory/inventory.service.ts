@@ -71,29 +71,19 @@ export class InventoryService {
     })
   }
 
-  async create(dto: CreateInventoryDto): Promise<InventoryResDto> {
-    const inventory = await this.prismaService.inventory.create({
+  async create(dto: CreateInventoryDto) {
+    await this.prismaService.inventory.create({
       data: {
         ...dto,
         stock: dto.stock || dto.purchasedQty,
       },
-      include: this.include,
-      omit: {
-        productId: true,
-        supplierId: true,
-      },
     })
-    // @ts-expect-error type
-    return inventory
   }
 
-  async update(
-    id: number,
-    dto: UpdateInventoryDto,
-  ): Promise<InventoryResDto[]> {
+  async update(id: number, dto: UpdateInventoryDto) {
     await this.findOne(id)
 
-    const inventory = await this.prismaService.inventory.update({
+    await this.prismaService.inventory.update({
       where: {
         id,
       },
@@ -101,31 +91,19 @@ export class InventoryService {
         ...dto,
         stock: dto.stock || dto.purchasedQty,
       },
-      include: this.include,
-      omit: {
-        productId: true,
-        supplierId: true,
-      },
     })
-    // @ts-expect-error type
-    return inventory
   }
 
-  async findOne(id: number): Promise<InventoryResDto[]> {
+  async findOne(id: number) {
     const inventory = await this.prismaService.inventory.findUnique({
       where: {
         id,
-      },
-      include: this.include,
-      omit: {
-        productId: true,
-        supplierId: true,
       },
     })
 
     if (!inventory)
       throw new NotFoundException(`Inventory with id ${id} not found`)
-    // @ts-expect-error type
+
     return inventory
   }
 
@@ -188,7 +166,7 @@ export class InventoryService {
         HttpStatus.BAD_REQUEST,
       )
 
-    return this.prismaService.inventory.delete({
+    await this.prismaService.inventory.delete({
       where: {
         id,
       },

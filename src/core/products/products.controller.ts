@@ -13,6 +13,7 @@ import { CreateProductDto } from './dto/req/create-product.dto'
 import { UpdateProductDto } from './dto/req/update-product.dto'
 import { ProductsFiltersDto } from './dto/req/product-filters.dto'
 import { ProductsSearchDto } from './dto/req/product-search-dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('products')
 export class ProductsController {
@@ -24,6 +25,7 @@ export class ProductsController {
   }
 
   @Post()
+  @ApiMessage('Producto creado correctamente')
   create(@Body() createDto: CreateProductDto) {
     return this.service.create(createDto)
   }
@@ -39,11 +41,13 @@ export class ProductsController {
   // }
 
   @Patch(':id/toggle-status')
+  @ApiMessage('Producto actualizado correctamente')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
     return this.service.toggleStatus(id)
   }
 
   @Patch(':id')
+  @ApiMessage('Producto actualizado correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateProductDto,

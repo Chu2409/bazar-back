@@ -13,6 +13,7 @@ import { CreateSupplierDto } from './dto/req/create-supplier.dto'
 import { UpdateSupplierDto } from './dto/req/update-supplier.dto'
 import { SuppliersFiltersDto } from './dto/req/suppliers-filters.dto'
 import { SuppliersSearchDto } from './dto/req/supplier-search.dto'
+import { ApiMessage } from 'src/common/decorators/api-message.decorator'
 
 @Controller('suppliers')
 export class SuppliersController {
@@ -24,6 +25,7 @@ export class SuppliersController {
   }
 
   @Post()
+  @ApiMessage('Proveedor creado correctamente')
   create(@Body() createDto: CreateSupplierDto) {
     return this.service.create(createDto)
   }
@@ -39,11 +41,13 @@ export class SuppliersController {
   // }
 
   @Patch(':id/toggle-status')
+  @ApiMessage('Proveedor actualizado correctamente')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
     return this.service.toggleStatus(id)
   }
 
   @Patch(':id')
+  @ApiMessage('Proveedor actualizado correctamente')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateSupplierDto,

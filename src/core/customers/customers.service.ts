@@ -132,13 +132,13 @@ export class CustomersService {
     }
   }
 
-  async create(dto: CreateCustomerDto): Promise<CustomerResDto[]> {
+  async create(dto: CreateCustomerDto) {
     await this.existsByEmailOrIdentification(
       dto.person.email,
       dto.person.identifications.map((i) => i.value),
     )
 
-    const customer = await this.prismaService.customer.create({
+    await this.prismaService.customer.create({
       data: {
         ...dto,
         person: {
@@ -150,16 +150,10 @@ export class CustomersService {
           },
         },
       },
-      include: this.include,
-      omit: {
-        personId: true,
-      },
     })
-    // @ts-expect-error issues with types
-    return customer
   }
 
-  async update(id: number, dto: UpdateCustomerDto): Promise<CustomerResDto> {
+  async update(id: number, dto: UpdateCustomerDto) {
     await this.existsByEmailOrIdentification(
       dto.person?.email,
       dto.person?.identifications
@@ -168,7 +162,7 @@ export class CustomersService {
       id,
     )
 
-    const updated = await this.prismaService.customer.update({
+    await this.prismaService.customer.update({
       where: { id },
       data: {
         ...dto,
@@ -184,36 +178,27 @@ export class CustomersService {
           },
         },
       },
-      include: this.include,
-      omit: {
-        personId: true,
-      },
     })
-    // @ts-expect-error issues with types
-    return updated
   }
 
-  async findOne(id: number): Promise<CustomerResDto> {
+  async findOne(id: number) {
     const entity = await this.prismaService.customer.findUnique({
       where: { id },
     })
 
     if (!entity) throw new NotFoundException(`Customer with id ${id} not found`)
-    // @ts-expect-error issues with types
     return entity
   }
 
-  async toggleStatus(id: number): Promise<boolean> {
+  async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    const success = await this.prismaService.customer.update({
+    await this.prismaService.customer.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
-
-    return !!success
   }
 
   private async existsByEmailOrIdentification(

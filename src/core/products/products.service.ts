@@ -95,36 +95,44 @@ export class ProductsService {
     }
   }
 
-  async create(dto: CreateProductDto): Promise<SimpleProductResDto> {
-    const alreadyExists = await this.prismaService.product.findUnique({
+  async create(dto: CreateProductDto) {
+    const alreadyExists = await this.prismaService.product.findFirst({
       where: {
-        barcode: dto.barcode,
+        OR: [
+          {
+            barcode: dto.barcode,
+          },
+          {
+            name: dto.name,
+          },
+        ],
       },
     })
 
     if (alreadyExists)
       throw new DisplayableException(
-        'Ya existe un producto con ese nombre',
+        'Ya existe un producto con el mismo código de barras o nombre',
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.product.create({
+    await this.prismaService.product.create({
       data: dto,
-      omit: {
-        categoryId: true,
-      },
     })
   }
 
-  async update(
-    id: number,
-    dto: UpdateProductDto,
-  ): Promise<SimpleProductResDto> {
+  async update(id: number, dto: UpdateProductDto) {
     await this.findOne(id)
 
-    const alreadyExists = await this.prismaService.product.findUnique({
+    const alreadyExists = await this.prismaService.product.findFirst({
       where: {
-        barcode: dto.barcode,
+        OR: [
+          {
+            barcode: dto.barcode,
+          },
+          {
+            name: dto.name,
+          },
+        ],
         AND: {
           id: {
             not: id,
@@ -135,25 +143,19 @@ export class ProductsService {
 
     if (alreadyExists)
       throw new DisplayableException(
-        'Ya existe un producto con ese nombre',
+        'Ya existe un producto con el mismo código de barras o nombre',
         HttpStatus.BAD_REQUEST,
       )
 
-    return await this.prismaService.product.update({
+    await this.prismaService.product.update({
       where: { id },
       data: dto,
-      omit: {
-        categoryId: true,
-      },
     })
   }
 
-  async findOne(id: number): Promise<SimpleProductResDto> {
+  async findOne(id: number) {
     const entity = await this.prismaService.product.findUnique({
       where: { id },
-      omit: {
-        categoryId: true,
-      },
     })
 
     if (!entity) {
@@ -163,16 +165,14 @@ export class ProductsService {
     return entity
   }
 
-  async toggleStatus(id: number): Promise<boolean> {
+  async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    const success = await this.prismaService.product.update({
+    await this.prismaService.product.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
-
-    return !!success
   }
 }
