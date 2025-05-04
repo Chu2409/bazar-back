@@ -115,9 +115,11 @@ export class ProductsService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.product.create({
+    const success = await this.prismaService.product.create({
       data: dto,
     })
+
+    return !!success
   }
 
   async update(id: number, dto: UpdateProductDto) {
@@ -147,10 +149,12 @@ export class ProductsService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.product.update({
+    const success = await this.prismaService.product.update({
       where: { id },
       data: dto,
     })
+
+    return !!success
   }
 
   async findOne(id: number) {
@@ -168,11 +172,13 @@ export class ProductsService {
   async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    await this.prismaService.product.update({
+    const success = await this.prismaService.product.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
+
+    return !!success
   }
 }

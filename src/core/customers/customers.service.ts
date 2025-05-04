@@ -138,7 +138,7 @@ export class CustomersService {
       dto.person.identifications.map((i) => i.value),
     )
 
-    await this.prismaService.customer.create({
+    const success = await this.prismaService.customer.create({
       data: {
         ...dto,
         person: {
@@ -151,6 +151,8 @@ export class CustomersService {
         },
       },
     })
+
+    return !!success
   }
 
   async update(id: number, dto: UpdateCustomerDto) {
@@ -162,7 +164,7 @@ export class CustomersService {
       id,
     )
 
-    await this.prismaService.customer.update({
+    const success = await this.prismaService.customer.update({
       where: { id },
       data: {
         ...dto,
@@ -179,6 +181,8 @@ export class CustomersService {
         },
       },
     })
+
+    return !!success
   }
 
   async findOne(id: number) {
@@ -193,12 +197,14 @@ export class CustomersService {
   async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    await this.prismaService.customer.update({
+    const success = await this.prismaService.customer.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
+
+    return !!success
   }
 
   private async existsByEmailOrIdentification(

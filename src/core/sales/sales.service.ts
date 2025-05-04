@@ -153,7 +153,7 @@ export class SalesService {
   }
 
   async create(createDto: CreateSaleDto) {
-    await this.prismaService.sale.create({
+    const success = await this.prismaService.sale.create({
       data: {
         ...createDto,
         items: {
@@ -161,12 +161,14 @@ export class SalesService {
         },
       },
     })
+
+    return !!success
   }
 
   async update(id: number, updateDto: UpdateSaleDto) {
     await this.findOne(id)
 
-    await this.prismaService.sale.update({
+    const success = await this.prismaService.sale.update({
       where: { id },
       data: {
         ...updateDto,
@@ -178,5 +180,7 @@ export class SalesService {
         },
       },
     })
+
+    return !!success
   }
 }

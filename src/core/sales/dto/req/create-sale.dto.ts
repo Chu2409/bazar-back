@@ -17,7 +17,7 @@ export class CreateSaleDto {
   @IsNumber({}, { message: 'discount must be a positive number' })
   @Min(0, { message: 'discount must be a positive number' })
   @IsOptional()
-  discount: number
+  discount?: number
 
   @IsPositive({ message: 'total must be a positive number' })
   total: number

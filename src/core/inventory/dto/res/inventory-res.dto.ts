@@ -7,8 +7,6 @@ export interface InventoryResDto {
   stock: number
   unitCost: number
   totalCost: number
-  productId: number
-  supplierId: number
   product: ProductResDto
   supplier: SupplierResDto
 }

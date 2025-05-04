@@ -72,18 +72,20 @@ export class InventoryService {
   }
 
   async create(dto: CreateInventoryDto) {
-    await this.prismaService.inventory.create({
+    const success = await this.prismaService.inventory.create({
       data: {
         ...dto,
         stock: dto.stock || dto.purchasedQty,
       },
     })
+
+    return !!success
   }
 
   async update(id: number, dto: UpdateInventoryDto) {
     await this.findOne(id)
 
-    await this.prismaService.inventory.update({
+    const success = await this.prismaService.inventory.update({
       where: {
         id,
       },
@@ -92,6 +94,8 @@ export class InventoryService {
         stock: dto.stock || dto.purchasedQty,
       },
     })
+
+    return !!success
   }
 
   async findOne(id: number) {
@@ -166,10 +170,12 @@ export class InventoryService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.inventory.delete({
+    const success = await this.prismaService.inventory.delete({
       where: {
         id,
       },
     })
+
+    return !!success
   }
 }

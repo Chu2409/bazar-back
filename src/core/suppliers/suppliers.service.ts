@@ -79,9 +79,11 @@ export class SuppliersService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.supplier.create({
+    const success = await this.prismaService.supplier.create({
       data: dto,
     })
+
+    return !!success
   }
 
   async update(id: number, dto: UpdateSupplierDto) {
@@ -104,10 +106,12 @@ export class SuppliersService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.supplier.update({
+    const success = await this.prismaService.supplier.update({
       where: { id },
       data: dto,
     })
+
+    return !!success
   }
 
   async findOne(id: number) {
@@ -125,11 +129,13 @@ export class SuppliersService {
   async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    await this.prismaService.supplier.update({
+    const success = await this.prismaService.supplier.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
+
+    return !!success
   }
 }

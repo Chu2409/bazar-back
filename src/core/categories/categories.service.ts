@@ -91,9 +91,11 @@ export class CategoriesService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.category.create({
+    const success = await this.prismaService.category.create({
       data: dto,
     })
+
+    return !!success
   }
 
   async update(id: number, dto: UpdateCategoryDto) {
@@ -116,20 +118,24 @@ export class CategoriesService {
         HttpStatus.BAD_REQUEST,
       )
 
-    await this.prismaService.category.update({
+    const success = await this.prismaService.category.update({
       where: { id },
       data: dto,
     })
+
+    return !!success
   }
 
   async toggleStatus(id: number) {
     const entity = await this.findOne(id)
 
-    await this.prismaService.category.update({
+    const success = await this.prismaService.category.update({
       where: { id },
       data: {
         active: !entity.active,
       },
     })
+
+    return !!success
   }
 }
