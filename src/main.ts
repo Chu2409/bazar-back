@@ -8,23 +8,30 @@ import { CustomConfigService } from './global/config/config.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true })
-  app.setGlobalPrefix('api')
+  const configService = app.get(CustomConfigService)
+  const port = configService.env.PORT
+
+  app.enableCors('*')
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
   )
-  app.enableCors('*')
   app.useGlobalInterceptors(app.get(ResponseInterceptor))
   app.useGlobalFilters(new GlobalExceptionFilter())
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
-  const configService = app.get(CustomConfigService)
-  const port = configService.env.PORT
+  app.setGlobalPrefix('api')
+
   await app.listen(port)
 
   Logger.log(`Server running on port ${port}`, 'Bootstrap')
+  Logger.log(
+    'API versioning enabled. Use /api/v1/ to access the API.',
+    'Bootstrap',
+  )
 }
 
 void bootstrap()

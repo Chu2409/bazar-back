@@ -1,0 +1,15 @@
+import { OmitType, PartialType } from '@nestjs/mapped-types'
+import { CreateCustomerDto } from './create-customer.dto'
+import { Type } from 'class-transformer'
+import { ValidateNested, IsOptional } from 'class-validator'
+import { UpdatePersonDto } from 'src/core/people/dto/req/update-person.dto'
+
+export class UpdateCustomerDto extends OmitType(
+  PartialType(CreateCustomerDto),
+  ['person'] as const,
+) {
+  @ValidateNested()
+  @Type(() => UpdatePersonDto)
+  @IsOptional()
+  person?: UpdatePersonDto
+}

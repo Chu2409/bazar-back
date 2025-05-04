@@ -9,10 +9,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { CategoriesService } from './categories.service'
-import { CreateCategoryDto } from './dto/create.dto'
-import { UpdateCategoryDto } from './dto/update.dto'
-import { CategoriesFiltersDto } from './dto/filters.dto'
-import { CategoriesSearchDto } from './dto/search.dto'
+import { CreateCategoryDto } from './dto/req/create-category.dto'
+import { UpdateCategoryDto } from './dto/req/update-category.dto'
+import { CategoriesFiltersDto } from './dto/req/category-filters.dto'
+import { CategoriesSearchDto } from './dto/req/category-search.dto'
 
 @Controller('categories')
 export class CategoriesController {
@@ -23,20 +23,10 @@ export class CategoriesController {
     return this.service.getBySearch(dto)
   }
 
-  @Post()
-  create(@Body() createDto: CreateCategoryDto) {
-    return this.service.create(createDto)
-  }
-
-  @Get()
-  findAll(@Query() paginationDto: CategoriesFiltersDto) {
-    return this.service.findAll(paginationDto)
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id)
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.service.findOne(id)
+  // }
 
   @Patch(':id/toggle-status')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
@@ -49,5 +39,15 @@ export class CategoriesController {
     @Body() updateDto: UpdateCategoryDto,
   ) {
     return this.service.update(id, updateDto)
+  }
+
+  @Get()
+  findAll(@Query() paginationDto: CategoriesFiltersDto) {
+    return this.service.findAll(paginationDto)
+  }
+
+  @Post()
+  create(@Body() createDto: CreateCategoryDto) {
+    return this.service.create(createDto)
   }
 }

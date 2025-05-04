@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { CreateSaleDto } from './dto/create.dto'
-import { UpdateSaleDto } from './dto/update.dto'
+import { CreateSaleDto } from './dto/req/create-sale.dto'
+import { UpdateSaleDto } from './dto/req/update-sale.dto'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { SalesFiltersDto } from './dto/sales.dto'
+import { SalesFiltersDto } from './dto/req/sale-filters.dto'
 
 @Injectable()
 export class SalesService {
@@ -15,9 +15,16 @@ export class SalesService {
         include: {
           person: {
             include: {
-              identifications: true,
+              identifications: {
+                omit: {
+                  personId: true,
+                },
+              },
             },
           },
+        },
+        omit: {
+          personId: true,
         },
       },
       items: {
@@ -26,7 +33,15 @@ export class SalesService {
             include: {
               product: true,
             },
+            omit: {
+              productId: true,
+              supplierId: true,
+            },
           },
+        },
+        omit: {
+          inventoryId: true,
+          saleId: true,
         },
       },
     }
@@ -95,6 +110,9 @@ export class SalesService {
         include: this.include,
         orderBy: {
           id: 'desc',
+        },
+        omit: {
+          customerId: true,
         },
       }),
       this.prismaService.sale.count({

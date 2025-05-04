@@ -10,9 +10,9 @@ export interface IApiRes<T> {
 }
 
 export interface IApiPaginatedRes<T> {
+  records: T[]
   total: number
   limit: number
   page: number
   pages: number
-  records: T[]
 }

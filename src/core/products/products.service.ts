@@ -1,20 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { ProductsFiltersDto } from './dto/filters.dto'
+import { ProductsFiltersDto } from './dto/req/product-filters.dto'
 import {
   convertToFilterWhere,
   convertToStatusWhere,
 } from 'src/common/utils/converters'
-import { ProductsSearchDto } from './dto/search-dto'
-import { CreateProductDto } from './dto/create.dto'
-import { UpdateProductDto } from './dto/update.dto'
+import { ProductsSearchDto } from './dto/req/product-search-dto'
+import { CreateProductDto } from './dto/req/create-product.dto'
+import { UpdateProductDto } from './dto/req/update-product.dto'
+import { ProductResDto } from './dto/res/product-res.dto'
+import { SimpleProductResDto } from './dto/res/simple-product-res.dto'
+import { IApiPaginatedRes } from 'src/common/types/api-response.interface'
+import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getBySearch({ search }: ProductsSearchDto) {
+  async getBySearch({
+    search,
+  }: ProductsSearchDto): Promise<SimpleProductResDto[]> {
     return await this.prismaService.product.findMany({
       where: {
         OR: [
@@ -36,6 +42,9 @@ export class ProductsService {
         id: 'desc',
       },
       take: 10,
+      omit: {
+        categoryId: true,
+      },
     })
   }
 
@@ -45,7 +54,7 @@ export class ProductsService {
     search,
     categoryId,
     status,
-  }: ProductsFiltersDto) {
+  }: ProductsFiltersDto): Promise<IApiPaginatedRes<ProductResDto>> {
     const whereClause: Prisma.ProductWhereInput = {
       name: {
         contains: search,
@@ -68,6 +77,9 @@ export class ProductsService {
         orderBy: {
           id: 'desc',
         },
+        omit: {
+          categoryId: true,
+        },
       }),
       this.prismaService.product.count({
         where: whereClause,
@@ -83,26 +95,64 @@ export class ProductsService {
     }
   }
 
-  async create(dto: CreateProductDto) {
+  async create(dto: CreateProductDto): Promise<SimpleProductResDto> {
+    const alreadyExists = await this.prismaService.product.findUnique({
+      where: {
+        barcode: dto.barcode,
+      },
+    })
+
+    if (alreadyExists)
+      throw new DisplayableException(
+        'Ya existe un producto con ese nombre',
+        HttpStatus.BAD_REQUEST,
+      )
+
     return await this.prismaService.product.create({
       data: dto,
+      omit: {
+        categoryId: true,
+      },
     })
   }
 
-  async update(id: number, dto: UpdateProductDto) {
+  async update(
+    id: number,
+    dto: UpdateProductDto,
+  ): Promise<SimpleProductResDto> {
     await this.findOne(id)
+
+    const alreadyExists = await this.prismaService.product.findUnique({
+      where: {
+        barcode: dto.barcode,
+        AND: {
+          id: {
+            not: id,
+          },
+        },
+      },
+    })
+
+    if (alreadyExists)
+      throw new DisplayableException(
+        'Ya existe un producto con ese nombre',
+        HttpStatus.BAD_REQUEST,
+      )
 
     return await this.prismaService.product.update({
       where: { id },
       data: dto,
+      omit: {
+        categoryId: true,
+      },
     })
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<SimpleProductResDto> {
     const entity = await this.prismaService.product.findUnique({
       where: { id },
-      include: {
-        category: true,
+      omit: {
+        categoryId: true,
       },
     })
 

@@ -9,10 +9,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { ProductsService } from './products.service'
-import { CreateProductDto } from './dto/create.dto'
-import { UpdateProductDto } from './dto/update.dto'
-import { ProductsFiltersDto } from './dto/filters.dto'
-import { ProductsSearchDto } from './dto/search-dto'
+import { CreateProductDto } from './dto/req/create-product.dto'
+import { UpdateProductDto } from './dto/req/update-product.dto'
+import { ProductsFiltersDto } from './dto/req/product-filters.dto'
+import { ProductsSearchDto } from './dto/req/product-search-dto'
 
 @Controller('products')
 export class ProductsController {
@@ -33,10 +33,10 @@ export class ProductsController {
     return this.service.findAll(paginationDto)
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id)
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.service.findOne(id)
+  // }
 
   @Patch(':id/toggle-status')
   toggleStatus(@Param('id', ParseIntPipe) id: number) {

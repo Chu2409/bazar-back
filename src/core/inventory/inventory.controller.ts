@@ -10,10 +10,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { InventoryService } from './inventory.service'
-import { InventoryFiltersDto } from './dto/filters.dto'
-import { CreateInventoryDto } from './dto/create.dto'
-import { UpdateInventoryDto } from './dto/update.dto'
-import { InventorySearchDto } from './dto/search.dto'
+import { InventoryFiltersDto } from './dto/req/inventory-filters.dto'
+import { CreateInventoryDto } from './dto/req/create-inventory.dto'
+import { UpdateInventoryDto } from './dto/req/update-inventory.dto'
+import { InventorySearchDto } from './dto/req/inventory-search.dto'
 
 @Controller('inventory')
 export class InventoryController {

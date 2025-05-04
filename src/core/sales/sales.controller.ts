@@ -9,9 +9,9 @@ import {
   Query,
 } from '@nestjs/common'
 import { SalesService } from './sales.service'
-import { CreateSaleDto } from './dto/create.dto'
-import { UpdateSaleDto } from './dto/update.dto'
-import { SalesFiltersDto } from './dto/sales.dto'
+import { CreateSaleDto } from './dto/req/create-sale.dto'
+import { UpdateSaleDto } from './dto/req/update-sale.dto'
+import { SalesFiltersDto } from './dto/req/sale-filters.dto'
 
 @Controller('sales')
 export class SalesController {
@@ -27,10 +27,10 @@ export class SalesController {
     return this.service.findAll(paginationDto)
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id)
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.service.findOne(id)
+  // }
 
   @Patch(':id')
   update(

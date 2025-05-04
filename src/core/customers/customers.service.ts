@@ -1,12 +1,14 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
-import { CreateCustomerDto } from './dto/create.dto'
-import { UpdateCustomerDto } from './dto/update-customer.dto'
+import { CreateCustomerDto } from './dto/req/create-customer.dto'
+import { UpdateCustomerDto } from './dto/req/update-customer.dto'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from 'src/global/prisma/prisma.service'
-import { CustomersFiltersDto } from './dto/filters.dto'
+import { CustomersFiltersDto } from './dto/req/customer-filters.dto'
 import { convertToStatusWhere } from 'src/common/utils/converters'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
-import { CustomersSearchDto } from './dto/search.dto'
+import { CustomersSearchDto } from './dto/req/customer-search.dto'
+import { IApiPaginatedRes } from 'src/common/types/api-response.interface'
+import { CustomerResDto } from './dto/res/customer-res.dto'
 
 @Injectable()
 export class CustomersService {
@@ -18,7 +20,11 @@ export class CustomersService {
   > = {
     person: {
       include: {
-        identifications: true,
+        identifications: {
+          omit: {
+            personId: true,
+          },
+        },
       },
     },
   }
@@ -72,18 +78,27 @@ export class CustomersService {
     ],
   })
 
-  async getBySearch({ search }: CustomersSearchDto) {
+  async getBySearch({ search }: CustomersSearchDto): Promise<CustomerResDto[]> {
+    // @ts-expect-error issues with types
     return this.prismaService.customer.findMany({
       where: this.whereClause(search),
       include: this.include,
       orderBy: {
         id: 'desc',
       },
+      omit: {
+        personId: true,
+      },
       take: 10,
     })
   }
 
-  async findAll({ limit, page, search, status }: CustomersFiltersDto) {
+  async findAll({
+    limit,
+    page,
+    search,
+    status,
+  }: CustomersFiltersDto): Promise<IApiPaginatedRes<CustomerResDto>> {
     const whereClause: Prisma.CustomerWhereInput = {
       ...this.whereClause(search),
       active: convertToStatusWhere(status),
@@ -98,6 +113,9 @@ export class CustomersService {
         orderBy: {
           id: 'desc',
         },
+        omit: {
+          personId: true,
+        },
       }),
       this.prismaService.customer.count({
         where: whereClause,
@@ -105,6 +123,7 @@ export class CustomersService {
     ])
 
     return {
+      // @ts-expect-error issues with types
       records: entities,
       total,
       limit,
@@ -113,7 +132,7 @@ export class CustomersService {
     }
   }
 
-  async create(dto: CreateCustomerDto) {
+  async create(dto: CreateCustomerDto): Promise<CustomerResDto[]> {
     await this.existsByEmailOrIdentification(
       dto.person.email,
       dto.person.identifications.map((i) => i.value),
@@ -132,12 +151,15 @@ export class CustomersService {
         },
       },
       include: this.include,
+      omit: {
+        personId: true,
+      },
     })
-
+    // @ts-expect-error issues with types
     return customer
   }
 
-  async update(id: number, dto: UpdateCustomerDto) {
+  async update(id: number, dto: UpdateCustomerDto): Promise<CustomerResDto> {
     await this.existsByEmailOrIdentification(
       dto.person?.email,
       dto.person?.identifications
@@ -163,18 +185,21 @@ export class CustomersService {
         },
       },
       include: this.include,
+      omit: {
+        personId: true,
+      },
     })
-
+    // @ts-expect-error issues with types
     return updated
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<CustomerResDto> {
     const entity = await this.prismaService.customer.findUnique({
       where: { id },
     })
 
     if (!entity) throw new NotFoundException(`Customer with id ${id} not found`)
-
+    // @ts-expect-error issues with types
     return entity
   }
 

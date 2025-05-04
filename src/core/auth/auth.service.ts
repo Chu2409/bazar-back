@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
-import { SignInDto } from './dto/sign-in.dto'
+import { SignInDto } from './dto/req/sign-in.dto'
 import { JwtService } from '@nestjs/jwt'
 import { IJwtPayload } from './types/jwt-payload.interface'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
 import { comparePassword } from 'src/common/utils/encrypter'
 import { PrismaService } from 'src/global/prisma/prisma.service'
+import { SignInResDto } from './dto/res/sign-in-res.dto'
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn({ username, password }: SignInDto) {
+  async signIn({ username, password }: SignInDto): Promise<SignInResDto> {
     const user = await this.prismaService.user.findUnique({
       where: {
         username,

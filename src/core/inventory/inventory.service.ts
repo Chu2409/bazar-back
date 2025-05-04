@@ -1,15 +1,17 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'src/global/prisma/prisma.service'
 import { Prisma } from '@prisma/client'
-import { InventoryFiltersDto } from './dto/filters.dto'
+import { InventoryFiltersDto } from './dto/req/inventory-filters.dto'
 import {
   convertToFilterWhere,
   convertToStatusWhere,
 } from 'src/common/utils/converters'
 import { DisplayableException } from 'src/common/exceptions/displayable.exception'
-import { CreateInventoryDto } from './dto/create.dto'
-import { UpdateInventoryDto } from './dto/update.dto'
-import { InventorySearchDto } from './dto/search.dto'
+import { CreateInventoryDto } from './dto/req/create-inventory.dto'
+import { UpdateInventoryDto } from './dto/req/update-inventory.dto'
+import { InventorySearchDto } from './dto/req/inventory-search.dto'
+import { InventoryResDto } from './dto/res/inventory-res.dto'
+import { IApiPaginatedRes } from 'src/common/types/api-response.interface'
 
 @Injectable()
 export class InventoryService {
@@ -22,6 +24,9 @@ export class InventoryService {
     product: {
       include: {
         category: true,
+      },
+      omit: {
+        categoryId: true,
       },
     },
     supplier: true,
@@ -48,36 +53,44 @@ export class InventoryService {
     ],
   })
 
-  async getBySearch({ search }: InventorySearchDto) {
+  async getBySearch({
+    search,
+  }: InventorySearchDto): Promise<InventoryResDto[]> {
+    // @ts-expect-error type
     return await this.prismaService.inventory.findMany({
       where: this.whereClause(search),
       orderBy: {
         id: 'desc',
       },
-      include: {
-        product: {
-          include: {
-            category: true,
-          },
-        },
+      include: this.include,
+      omit: {
+        productId: true,
+        supplierId: true,
       },
       take: 10,
     })
   }
 
-  async create(dto: CreateInventoryDto) {
+  async create(dto: CreateInventoryDto): Promise<InventoryResDto> {
     const inventory = await this.prismaService.inventory.create({
       data: {
         ...dto,
         stock: dto.stock || dto.purchasedQty,
       },
       include: this.include,
+      omit: {
+        productId: true,
+        supplierId: true,
+      },
     })
-
+    // @ts-expect-error type
     return inventory
   }
 
-  async update(id: number, dto: UpdateInventoryDto) {
+  async update(
+    id: number,
+    dto: UpdateInventoryDto,
+  ): Promise<InventoryResDto[]> {
     await this.findOne(id)
 
     const inventory = await this.prismaService.inventory.update({
@@ -89,22 +102,30 @@ export class InventoryService {
         stock: dto.stock || dto.purchasedQty,
       },
       include: this.include,
+      omit: {
+        productId: true,
+        supplierId: true,
+      },
     })
-
+    // @ts-expect-error type
     return inventory
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<InventoryResDto[]> {
     const inventory = await this.prismaService.inventory.findUnique({
       where: {
         id,
       },
       include: this.include,
+      omit: {
+        productId: true,
+        supplierId: true,
+      },
     })
 
     if (!inventory)
       throw new NotFoundException(`Inventory with id ${id} not found`)
-
+    // @ts-expect-error type
     return inventory
   }
 
@@ -114,7 +135,7 @@ export class InventoryService {
     search,
     status,
     categoryId,
-  }: InventoryFiltersDto) {
+  }: InventoryFiltersDto): Promise<IApiPaginatedRes<InventoryResDto>> {
     const whereClause: Prisma.InventoryWhereInput = {
       ...this.whereClause(search),
       product: {
@@ -134,6 +155,10 @@ export class InventoryService {
         orderBy: {
           id: 'desc',
         },
+        omit: {
+          productId: true,
+          supplierId: true,
+        },
       }),
       this.prismaService.inventory.count({
         where: whereClause,
@@ -141,6 +166,7 @@ export class InventoryService {
     ])
 
     return {
+      // @ts-expect-error type
       records: entities,
       total,
       limit,
