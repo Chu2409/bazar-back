@@ -153,34 +153,64 @@ export class SalesService {
   }
 
   async create(createDto: CreateSaleDto) {
-    const success = await this.prismaService.sale.create({
-      data: {
-        ...createDto,
-        items: {
-          createMany: { data: createDto.items },
+    await this.prismaService.$transaction([
+      this.prismaService.sale.create({
+        data: {
+          ...createDto,
+          items: { createMany: { data: createDto.items } },
         },
-      },
-    })
-
-    return !!success
+      }),
+      ...createDto.items.map((item) =>
+        this.prismaService.inventory.update({
+          where: { id: item.inventoryId },
+          data: { stock: { decrement: item.qty } },
+        }),
+      ),
+    ])
+    return true
   }
 
   async update(id: number, updateDto: UpdateSaleDto) {
-    await this.findOne(id)
+    await this.prismaService.$transaction(async (prisma) => {
+      const currentSale = await prisma.sale.findUnique({
+        where: { id },
+        include: { items: true },
+      })
 
-    const success = await this.prismaService.sale.update({
-      where: { id },
-      data: {
-        ...updateDto,
-        items: {
-          updateMany: updateDto.items?.map((i) => ({
-            where: { id: i.id },
-            data: i,
-          })),
+      if (!currentSale) throw new NotFoundException('Sale not found')
+
+      await prisma.sale.update({
+        where: { id },
+        data: {
+          ...updateDto,
+          items: {
+            updateMany: updateDto.items?.map((i) => ({
+              where: { id: i.inventoryId },
+              data: i,
+            })),
+          },
         },
-      },
-    })
+      })
 
-    return !!success
+      if (updateDto.items) {
+        await Promise.all(
+          updateDto.items.map(async (updatedItem) => {
+            const originalItem = currentSale.items.find(
+              (i) => i.inventoryId === updatedItem.inventoryId,
+            )
+            if (!originalItem) return
+
+            const qtyDifference = (updatedItem.qty ?? 0) - originalItem.qty
+            if (qtyDifference !== 0) {
+              await prisma.inventory.update({
+                where: { id: originalItem.inventoryId },
+                data: { stock: { decrement: qtyDifference } },
+              })
+            }
+          }),
+        )
+      }
+    })
+    return true
   }
 }

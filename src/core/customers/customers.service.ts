@@ -161,7 +161,6 @@ export class CustomersService {
       dto.person?.identifications
         ?.map((i) => i.value)
         .filter((value): value is string => value !== undefined),
-      id,
     )
 
     const success = await this.prismaService.customer.update({
@@ -210,31 +209,25 @@ export class CustomersService {
   private async existsByEmailOrIdentification(
     email?: string,
     identifications: string[] = [],
-    id?: number,
   ) {
-    const exists = await this.prismaService.customer.findFirst({
+    const exists = await this.prismaService.person.findFirst({
       where: {
-        id: {
-          not: id,
-        },
-        person: {
-          OR: [
-            {
-              email: {
-                equals: email,
-              },
+        OR: [
+          {
+            email: {
+              equals: email,
             },
-            {
-              identifications: {
-                some: {
-                  value: {
-                    in: identifications,
-                  },
+          },
+          {
+            identifications: {
+              some: {
+                value: {
+                  in: identifications,
                 },
               },
             },
-          ],
-        },
+          },
+        ],
       },
     })
 

@@ -58,7 +58,7 @@ export class InventoryService {
   }: InventorySearchDto): Promise<InventoryResDto[]> {
     // @ts-expect-error type
     return await this.prismaService.inventory.findMany({
-      where: this.whereClause(search),
+      where: { ...this.whereClause(search), stock: { gt: 0 } },
       orderBy: {
         id: 'desc',
       },
